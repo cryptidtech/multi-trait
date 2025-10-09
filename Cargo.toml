@@ -13,5 +13,13 @@ default = ["std"]
 std = ["unsigned-varint/std"]
 
 [dependencies]
-thiserror = { version = "1.0", default-features = false }
+thiserror = { version = "2.0", default-features = false }
 unsigned-varint = { version = "0.8", default-features = false }
+
+[dev-dependencies]
+proptest = "1.4"
+criterion = "0.5"
+
+[[bench]]
+name = "encoding"
+harness = false
