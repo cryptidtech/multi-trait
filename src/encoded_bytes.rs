@@ -38,7 +38,7 @@ use unsigned_varint::decode;
 /// ## Creating from valid data
 ///
 /// ```rust
-/// use multitrait::EncodedBytes;
+/// use multi_trait::EncodedBytes;
 ///
 /// // Valid varint encoding of 42
 /// let bytes = vec![42u8];
@@ -49,7 +49,7 @@ use unsigned_varint::decode;
 /// ## Validation catches invalid data
 ///
 /// ```rust
-/// use multitrait::EncodedBytes;
+/// use multi_trait::EncodedBytes;
 ///
 /// // Invalid: continuation bit set but no following byte
 /// let invalid = vec![0x80];
@@ -60,7 +60,7 @@ use unsigned_varint::decode;
 /// ## Zero-cost unwrapping
 ///
 /// ```rust
-/// use multitrait::EncodedBytes;
+/// use multi_trait::EncodedBytes;
 ///
 /// let bytes = vec![42u8];
 /// let encoded = EncodedBytes::try_from(bytes).unwrap();
@@ -85,7 +85,7 @@ impl EncodedBytes {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::EncodedBytes;
+    /// use multi_trait::EncodedBytes;
     ///
     /// let encoded = EncodedBytes::new(&[42]).unwrap();
     /// assert_eq!(encoded.as_ref(), &[42]);
@@ -99,7 +99,7 @@ impl EncodedBytes {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::EncodedBytes;
+    /// use multi_trait::EncodedBytes;
     ///
     /// let encoded = EncodedBytes::new(&[42]).unwrap();
     /// assert_eq!(encoded.len(), 1);
@@ -118,7 +118,7 @@ impl EncodedBytes {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::EncodedBytes;
+    /// use multi_trait::EncodedBytes;
     ///
     /// let encoded = EncodedBytes::new(&[42]).unwrap();
     /// assert!(!encoded.is_empty());
@@ -133,7 +133,7 @@ impl EncodedBytes {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::EncodedBytes;
+    /// use multi_trait::EncodedBytes;
     ///
     /// let encoded = EncodedBytes::new(&[42]).unwrap();
     /// assert_eq!(encoded.as_bytes(), &[42]);
@@ -150,7 +150,7 @@ impl EncodedBytes {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::EncodedBytes;
+    /// use multi_trait::EncodedBytes;
     ///
     /// let encoded = EncodedBytes::new(&[42]).unwrap();
     /// let bytes = encoded.into_vec();
@@ -183,7 +183,7 @@ impl TryFrom<Vec<u8>> for EncodedBytes {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::EncodedBytes;
+    /// use multi_trait::EncodedBytes;
     ///
     /// // Valid single-byte encoding
     /// let valid = vec![42];
@@ -208,9 +208,15 @@ impl TryFrom<Vec<u8>> for EncodedBytes {
             Ok((_, remaining)) => remaining,
             Err(source) => {
                 #[cfg(feature = "std")]
-                { return Err(Error::UnsignedVarintDecode { source }); }
+                {
+                    return Err(Error::UnsignedVarintDecode { source });
+                }
                 #[cfg(not(feature = "std"))]
-                { return Err(Error::UnsignedVarintDecode { message: format!("{:?}", source) }); }
+                {
+                    return Err(Error::UnsignedVarintDecode {
+                        message: format!("{:?}", source),
+                    });
+                }
             }
         };
 
@@ -236,7 +242,7 @@ impl From<EncodedBytes> for Vec<u8> {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::EncodedBytes;
+    /// use multi_trait::EncodedBytes;
     ///
     /// let encoded = EncodedBytes::new(&[42]).unwrap();
     /// let bytes: Vec<u8> = encoded.into();
@@ -254,7 +260,7 @@ impl AsRef<[u8]> for EncodedBytes {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::EncodedBytes;
+    /// use multi_trait::EncodedBytes;
     ///
     /// let encoded = EncodedBytes::new(&[42]).unwrap();
     /// let slice: &[u8] = encoded.as_ref();
@@ -276,7 +282,7 @@ impl Deref for EncodedBytes {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::EncodedBytes;
+    /// use multi_trait::EncodedBytes;
     ///
     /// let encoded = EncodedBytes::new(&[42]).unwrap();
     /// assert_eq!(encoded[0], 42); // Deref enables indexing
@@ -383,7 +389,7 @@ mod tests {
     }
 
     // Compile-time verification of Send + Sync
-    #[allow(dead_code)]
+    #[test]
     fn assert_send_sync() {
         fn is_send<T: Send>() {}
         fn is_sync<T: Sync>() {}

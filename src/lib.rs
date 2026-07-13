@@ -41,7 +41,7 @@
 //! ## Quick Start
 //!
 //! ```rust
-//! use multitrait::{EncodeInto, TryDecodeFrom};
+//! use multi_trait::{EncodeInto, TryDecodeFrom};
 //!
 //! // Encoding: Convert a value to compact varint bytes
 //! let value = 42u32;
@@ -59,7 +59,7 @@
 //! The [`EncodeInto`] trait provides efficient varint encoding:
 //!
 //! ```rust
-//! use multitrait::EncodeInto;
+//! use multi_trait::EncodeInto;
 //!
 //! // Small values use fewer bytes
 //! assert_eq!(0u8.encode_into(), vec![0]);
@@ -77,7 +77,7 @@
 //! The [`TryDecodeFrom`] trait enables zero-copy parsing with error handling:
 //!
 //! ```rust
-//! use multitrait::TryDecodeFrom;
+//! use multi_trait::TryDecodeFrom;
 //!
 //! // Decode from byte slice
 //! let bytes = vec![0xFF, 0xFF, 0x03]; // Varint encoding of 65535
@@ -96,7 +96,7 @@
 //! Define sentinel/null values for custom types:
 //!
 //! ```rust
-//! use multitrait::Null;
+//! use multi_trait::Null;
 //!
 //! struct MyId(u64);
 //!
@@ -122,7 +122,7 @@
 //! All decode operations return a [`Result`] with a structured [`Error`] type:
 //!
 //! ```rust
-//! use multitrait::{TryDecodeFrom, Error};
+//! use multi_trait::{TryDecodeFrom, Error};
 //!
 //! let truncated = vec![0xFF]; // Incomplete varint
 //! match u16::try_decode_from(&truncated) {
@@ -139,7 +139,7 @@
 //! The [`EncodeIntoBuffer`] trait enables encoding without allocations:
 //!
 //! ```rust
-//! use multitrait::EncodeIntoBuffer;
+//! use multi_trait::EncodeIntoBuffer;
 //!
 //! // Create a reusable buffer
 //! let mut buffer = Vec::with_capacity(100);
@@ -158,7 +158,7 @@
 //! The [`EncodeIntoArray`] trait provides stack-only encoding for embedded systems:
 //!
 //! ```rust
-//! use multitrait::EncodeIntoArray;
+//! use multi_trait::EncodeIntoArray;
 //!
 //! // Encode to stack-allocated array (no heap)
 //! let (array, len) = 42u8.encode_into_array();
@@ -174,7 +174,7 @@
 //! represent valid varint encodings:
 //!
 //! ```rust
-//! use multitrait::EncodedBytes;
+//! use multi_trait::EncodedBytes;
 //!
 //! // Validation happens at construction
 //! let valid = vec![42u8];
@@ -219,7 +219,7 @@
 //! The [`EncodedBytes`] newtype is explicitly marked as `Send + Sync`:
 //!
 //! ```rust
-//! use multitrait::EncodedBytes;
+//! use multi_trait::EncodedBytes;
 //! use std::sync::Arc;
 //! use std::thread;
 //!
@@ -783,7 +783,7 @@ mod test {
     // ========================================================================
 
     /// Compile-time verification that Error is Send + Sync
-    #[allow(dead_code)]
+    #[test]
     fn assert_error_send_sync() {
         fn is_send<T: Send>() {}
         fn is_sync<T: Sync>() {}
@@ -792,7 +792,7 @@ mod test {
     }
 
     /// Compile-time verification that EncodedBytes is Send + Sync
-    #[allow(dead_code)]
+    #[test]
     fn assert_encoded_bytes_send_sync() {
         fn is_send<T: Send>() {}
         fn is_sync<T: Sync>() {}
@@ -1094,7 +1094,7 @@ mod test {
     // ========================================================================
 
     /// Verify that primitive types used with traits are Send + Sync
-    #[allow(dead_code)]
+    #[test]
     fn assert_primitives_send_sync() {
         fn is_send<T: Send>() {}
         fn is_sync<T: Sync>() {}
@@ -1121,7 +1121,7 @@ mod test {
     }
 
     /// Verify that encoded data types are Send + Sync
-    #[allow(dead_code)]
+    #[test]
     fn assert_encoded_types_send_sync() {
         fn is_send<T: Send>() {}
         fn is_sync<T: Sync>() {}

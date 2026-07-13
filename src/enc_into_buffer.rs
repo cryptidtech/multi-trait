@@ -25,7 +25,7 @@
 //! ## Single value encoding
 //!
 //! ```rust
-//! use multitrait::EncodeIntoBuffer;
+//! use multi_trait::EncodeIntoBuffer;
 //!
 //! let mut buffer = Vec::new();
 //! 42u8.encode_into_buffer(&mut buffer);
@@ -35,7 +35,7 @@
 //! ## Sequential encoding (multiple values)
 //!
 //! ```rust
-//! use multitrait::EncodeIntoBuffer;
+//! use multi_trait::EncodeIntoBuffer;
 //!
 //! let mut buffer = Vec::new();
 //! 42u8.encode_into_buffer(&mut buffer);
@@ -49,7 +49,7 @@
 //! ## Buffer reuse
 //!
 //! ```rust
-//! use multitrait::EncodeIntoBuffer;
+//! use multi_trait::EncodeIntoBuffer;
 //!
 //! let mut buffer = Vec::with_capacity(100);
 //! for i in 0u8..10 {
@@ -88,7 +88,7 @@ use unsigned_varint::encode;
 /// # Examples
 ///
 /// ```rust
-/// use multitrait::EncodeIntoBuffer;
+/// use multi_trait::EncodeIntoBuffer;
 ///
 /// // Create a reusable buffer
 /// let mut buffer = Vec::with_capacity(64);
@@ -121,7 +121,7 @@ pub trait EncodeIntoBuffer {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::EncodeIntoBuffer;
+    /// use multi_trait::EncodeIntoBuffer;
     ///
     /// let mut buffer = Vec::new();
     /// 42u8.encode_into_buffer(&mut buffer);
@@ -167,16 +167,10 @@ macro_rules! impl_encode_into_buffer {
                     let mut buf = encode::$buffer_fn();
 
                     // Encode value into temporary buffer
-                    encode::$encode_fn(*self, &mut buf);
-
-                    // Find the length efficiently by locating the last byte marker
-                    let len = buf
-                        .iter()
-                        .position(|&b| unsigned_varint::decode::is_last(b))
-                        .map_or(buf.len(), |pos| pos + 1);
+                    let encoded = encode::$encode_fn(*self, &mut buf);
 
                     // Extend the target buffer with the encoded bytes
-                    buffer.extend_from_slice(&buf[..len]);
+                    buffer.extend_from_slice(encoded);
                 }
             }
         )+

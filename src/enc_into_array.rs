@@ -26,7 +26,7 @@
 //! ## Basic stack encoding
 //!
 //! ```rust
-//! use multitrait::EncodeIntoArray;
+//! use multi_trait::EncodeIntoArray;
 //!
 //! let (array, len) = 42u8.encode_into_array();
 //! assert_eq!(&array[..len], &[42]);
@@ -35,7 +35,7 @@
 //! ## Working with larger values
 //!
 //! ```rust
-//! use multitrait::EncodeIntoArray;
+//! use multi_trait::EncodeIntoArray;
 //!
 //! let (array, len) = 1000u16.encode_into_array();
 //! // Varint encoding of 1000 takes 2 bytes
@@ -48,7 +48,7 @@
 //! Each type has a compile-time known maximum encoded size:
 //!
 //! ```rust
-//! use multitrait::EncodeIntoArray;
+//! use multi_trait::EncodeIntoArray;
 //!
 //! // u8 values fit in 2 bytes max
 //! assert_eq!(<u8 as EncodeIntoArray>::MAX_ENCODED_SIZE, 2);
@@ -97,7 +97,7 @@ pub const MAX_VARINT_SIZE: usize = 19;
 /// # Examples
 ///
 /// ```rust
-/// use multitrait::EncodeIntoArray;
+/// use multi_trait::EncodeIntoArray;
 ///
 /// // Encode a value to a stack array
 /// let (array, len) = 42u8.encode_into_array();
@@ -132,7 +132,7 @@ pub trait EncodeIntoArray {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::EncodeIntoArray;
+    /// use multi_trait::EncodeIntoArray;
     ///
     /// let (array, len) = 42u8.encode_into_array();
     /// assert_eq!(len, 1);

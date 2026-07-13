@@ -24,7 +24,7 @@
 // #![no_std]
 // extern crate alloc;
 
-use multitrait::{EncodeInto, EncodeIntoArray, EncodeIntoBuffer, TryDecodeFrom};
+use multi_trait::{EncodeInto, EncodeIntoArray, EncodeIntoBuffer, TryDecodeFrom};
 
 fn main() {
     println!("=== Multitrait no_std Usage Patterns ===\n");
@@ -207,7 +207,7 @@ fn zero_allocation_decoding() {
 mod no_std_custom_types {
     // In actual no_std code:
     // use alloc::vec::Vec;
-    use multitrait::{EncodeIntoArray, EncodeIntoBuffer, TryDecodeFrom};
+    use multi_trait::{EncodeIntoArray, EncodeIntoBuffer, TryDecodeFrom};
 
     /// A custom type that uses only stack encoding
     #[derive(Debug, PartialEq)]
@@ -230,7 +230,7 @@ mod no_std_custom_types {
         }
 
         /// Decode from bytes (zero allocation)
-        pub fn decode_from(bytes: &[u8]) -> Result<(Self, &[u8]), multitrait::Error> {
+        pub fn decode_from(bytes: &[u8]) -> Result<(Self, &[u8]), multi_trait::Error> {
             let (sensor_id, remaining) = u8::try_decode_from(bytes)?;
             let (value, remaining) = u16::try_decode_from(remaining)?;
             Ok((SensorReading { sensor_id, value }, remaining))

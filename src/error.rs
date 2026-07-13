@@ -19,7 +19,7 @@ use alloc::string::String;
 /// # Examples
 ///
 /// ```
-/// use multitrait::{TryDecodeFrom, Error};
+/// use multi_trait::{TryDecodeFrom, Error};
 ///
 /// // Attempting to decode from empty slice returns an error
 /// let result = u8::try_decode_from(&[]);
@@ -76,7 +76,7 @@ pub enum Error {
     /// # Examples
     ///
     /// ```
-    /// use multitrait::{TryDecodeFrom, Error};
+    /// use multi_trait::{TryDecodeFrom, Error};
     ///
     /// // Empty slice cannot decode any value
     /// let result = u16::try_decode_from(&[]);

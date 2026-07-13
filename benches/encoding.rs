@@ -3,8 +3,10 @@
 //!
 //! Run with: `cargo bench`
 
-use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
-use multitrait::{EncodeInto, EncodeIntoArray, EncodeIntoBuffer, TryDecodeFrom};
+use std::hint::black_box;
+
+use multi_trait::{EncodeInto, EncodeIntoArray, EncodeIntoBuffer, TryDecodeFrom};
+use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 
 /// Benchmark encoding operations for various integer types
 fn bench_encoding(c: &mut Criterion) {

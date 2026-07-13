@@ -2,7 +2,7 @@
 #[cfg(not(feature = "std"))]
 use alloc::{vec, vec::Vec};
 
-use unsigned_varint::{decode, encode};
+use unsigned_varint::encode;
 
 /// Trait for encoding values into compact varint byte representation.
 ///
@@ -37,7 +37,7 @@ use unsigned_varint::{decode, encode};
 /// # Examples
 ///
 /// ```rust
-/// use multitrait::EncodeInto;
+/// use multi_trait::EncodeInto;
 ///
 /// // Small values use minimal space
 /// let small = 42u8;
@@ -72,7 +72,7 @@ pub trait EncodeInto {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::EncodeInto;
+    /// use multi_trait::EncodeInto;
     ///
     /// let value = 300u16;
     /// let bytes = value.encode_into();
@@ -114,16 +114,10 @@ macro_rules! impl_encode_into {
                     let mut buf = encode::$buffer_fn();
 
                     // Encode value into buffer
-                    encode::$encode_fn(*self, &mut buf);
-
-                    // Find the length efficiently by locating the last byte marker
-                    let len = buf
-                        .iter()
-                        .position(|&b| decode::is_last(b))
-                        .map_or(buf.len(), |pos| pos + 1);
+                    let encoded = encode::$encode_fn(*self, &mut buf);
 
                     // Single allocation: slice and convert to Vec
-                    buf[..len].to_vec()
+                    encoded.to_vec()
                 }
             }
         )+
@@ -148,4 +142,11 @@ impl_encode_into! {
     u64 => u64_buffer, u64;
     u128 => u128_buffer, u128;
     usize => usize_buffer, usize;
+}
+
+/// Encode a fixed-length byte array as raw bytes (used for BLS share identifiers).
+impl<const N: usize> EncodeInto for [u8; N] {
+    fn encode_into(&self) -> Vec<u8> {
+        self.as_slice().to_vec()
+    }
 }
