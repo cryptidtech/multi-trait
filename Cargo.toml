@@ -1,12 +1,14 @@
 [package]
-name = "multitrait"
+name = "multi-trait"
 version = "1.0.1"
 edition = "2021"
 authors = ["Dave Grantham <dwg@linuxprogrammer.org>"]
 description = "Common traits for multiformats types"
-repository = "https://github.com/cryptidtech/multitrait.git"
+repository = "https://github.com/cryptidtech/multi-trait.git"
 readme = "README.md"
 license = "Apache-2.0"
+keywords = ["multiformats", "encoding", "multicodec", "multibase", "no_std"]
+categories = ["encoding", "data-structures"]
 
 [features]
 default = ["std"]
@@ -18,8 +20,25 @@ unsigned-varint = { version = "0.8", default-features = false }
 
 [dev-dependencies]
 proptest = "1.4"
-criterion = "0.5"
+criterion = { version = "0.5", features = ["html_reports"] }
 
 [[bench]]
 name = "encoding"
 harness = false
+path = "benches/encoding.rs"
+
+[[example]]
+name = "basic"
+path = "examples/basic.rs"
+
+[[example]]
+name = "custom_type"
+path = "examples/custom_type.rs"
+
+[[example]]
+name = "error_handling"
+path = "examples/error_handling.rs"
+
+[[example]]
+name = "no_std"
+path = "examples/no_std.rs"

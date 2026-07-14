@@ -7,7 +7,7 @@
 //! - Sequential encoding and decoding
 //! - Using different encoding strategies
 
-use multitrait::{EncodeInto, EncodeIntoArray, EncodeIntoBuffer, TryDecodeFrom};
+use multi_trait::{EncodeInto, EncodeIntoArray, EncodeIntoBuffer, TryDecodeFrom};
 
 fn main() {
     println!("=== Multitrait Basic Example ===\n");

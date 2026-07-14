@@ -40,7 +40,7 @@ use unsigned_varint::decode;
 /// ## Basic Decoding
 ///
 /// ```rust
-/// use multitrait::TryDecodeFrom;
+/// use multi_trait::TryDecodeFrom;
 ///
 /// // Decode a single value
 /// let bytes = vec![42];
@@ -52,7 +52,7 @@ use unsigned_varint::decode;
 /// ## Sequential Decoding
 ///
 /// ```rust
-/// use multitrait::TryDecodeFrom;
+/// use multi_trait::TryDecodeFrom;
 ///
 /// // Decode multiple values from one buffer
 /// let bytes = vec![0x01, 0x02, 0x03];
@@ -69,7 +69,7 @@ use unsigned_varint::decode;
 /// ## Error Handling
 ///
 /// ```rust
-/// use multitrait::{TryDecodeFrom, Error};
+/// use multi_trait::{TryDecodeFrom, Error};
 ///
 /// // Handle decode errors
 /// let empty: &[u8] = &[];
@@ -112,7 +112,7 @@ pub trait TryDecodeFrom<'a>: Sized {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::TryDecodeFrom;
+    /// use multi_trait::TryDecodeFrom;
     ///
     /// let bytes = vec![0xFF, 0x01]; // Varint encoding of 255
     /// let (value, remaining) = u8::try_decode_from(&bytes).unwrap();
@@ -176,9 +176,15 @@ impl<'a> TryDecodeFrom<'a> for bool {
     fn try_decode_from(bytes: &'a [u8]) -> Result<(Self, &'a [u8]), Self::Error> {
         let (v, ptr) = decode::u8(bytes).map_err(|source| {
             #[cfg(feature = "std")]
-            { Self::Error::UnsignedVarintDecode { source } }
+            {
+                Self::Error::UnsignedVarintDecode { source }
+            }
             #[cfg(not(feature = "std"))]
-            { Self::Error::UnsignedVarintDecode { message: alloc::format!("{:?}", source) } }
+            {
+                Self::Error::UnsignedVarintDecode {
+                    message: alloc::format!("{:?}", source),
+                }
+            }
         })?;
         Ok(((v != 0), ptr))
     }
@@ -192,4 +198,24 @@ impl_try_decode_from! {
     u64 => u64;
     u128 => u128;
     usize => usize;
+}
+
+/// Decode a fixed-length byte array (reads N bytes; used for BLS share identifiers).
+impl<'a, const N: usize> TryDecodeFrom<'a> for [u8; N] {
+    type Error = Error;
+
+    fn try_decode_from(bytes: &'a [u8]) -> Result<([u8; N], &'a [u8]), Self::Error> {
+        if bytes.len() < N {
+            return Err(Error::InsufficientData {
+                expected: N,
+                actual: bytes.len(),
+            });
+        }
+        let (head, rest) = bytes.split_at(N);
+        let arr = <[u8; N]>::try_from(head).map_err(|_| Error::InsufficientData {
+            expected: N,
+            actual: bytes.len(),
+        })?;
+        Ok((arr, rest))
+    }
 }

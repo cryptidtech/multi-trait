@@ -20,7 +20,7 @@
 /// # Examples
 ///
 /// ```rust
-/// use multitrait::Null;
+/// use multi_trait::Null;
 ///
 /// #[derive(Debug, PartialEq)]
 /// struct UserId(u64);
@@ -57,7 +57,7 @@ pub trait Null {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::Null;
+    /// use multi_trait::Null;
     ///
     /// # struct ResourceId(u32);
     /// # impl Null for ResourceId {
@@ -77,7 +77,7 @@ pub trait Null {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::Null;
+    /// use multi_trait::Null;
     ///
     /// # struct Counter(i32);
     /// # impl Null for Counter {
@@ -115,7 +115,7 @@ pub trait Null {
 /// # Examples
 ///
 /// ```rust
-/// use multitrait::TryNull;
+/// use multi_trait::TryNull;
 ///
 /// #[derive(Debug)]
 /// struct BufferId(Vec<u8>);
@@ -163,7 +163,7 @@ pub trait TryNull: Sized {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::TryNull;
+    /// use multi_trait::TryNull;
     ///
     /// # struct ValidatedId(String);
     /// # impl TryNull for ValidatedId {
@@ -187,7 +187,7 @@ pub trait TryNull: Sized {
     /// # Examples
     ///
     /// ```rust
-    /// use multitrait::TryNull;
+    /// use multi_trait::TryNull;
     ///
     /// # struct OptionalData(Option<Vec<u8>>);
     /// # impl TryNull for OptionalData {

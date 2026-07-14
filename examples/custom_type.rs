@@ -8,7 +8,7 @@
 //! - Implementing Null and TryNull for custom types
 //! - Creating composable encoding/decoding for complex structures
 
-use multitrait::{EncodeInto, EncodeIntoBuffer, Null, TryDecodeFrom, TryNull};
+use multi_trait::{EncodeInto, EncodeIntoBuffer, Null, TryDecodeFrom, TryNull};
 
 fn main() {
     println!("=== Multitrait Custom Type Example ===\n");
@@ -47,7 +47,7 @@ fn simple_newtype() {
 
     // Implement TryDecodeFrom
     impl<'a> TryDecodeFrom<'a> for UserId {
-        type Error = multitrait::Error;
+        type Error = multi_trait::Error;
 
         fn try_decode_from(bytes: &'a [u8]) -> Result<(Self, &'a [u8]), Self::Error> {
             let (id, remaining) = u64::try_decode_from(bytes)?;
@@ -96,7 +96,7 @@ fn multi_field_struct() {
 
     // Implement TryDecodeFrom - decode fields sequentially
     impl<'a> TryDecodeFrom<'a> for Person {
-        type Error = multitrait::Error;
+        type Error = multi_trait::Error;
 
         fn try_decode_from(bytes: &'a [u8]) -> Result<(Self, &'a [u8]), Self::Error> {
             let (id, remaining) = u32::try_decode_from(bytes)?;
@@ -244,7 +244,7 @@ fn nested_structures() {
 
     // Implement TryDecodeFrom for Metadata
     impl<'a> TryDecodeFrom<'a> for Metadata {
-        type Error = multitrait::Error;
+        type Error = multi_trait::Error;
 
         fn try_decode_from(bytes: &'a [u8]) -> Result<(Self, &'a [u8]), Self::Error> {
             let (version, remaining) = u8::try_decode_from(bytes)?;
@@ -267,7 +267,7 @@ fn nested_structures() {
 
     // Implement TryDecodeFrom for Message
     impl<'a> TryDecodeFrom<'a> for Message {
-        type Error = multitrait::Error;
+        type Error = multi_trait::Error;
 
         fn try_decode_from(bytes: &'a [u8]) -> Result<(Self, &'a [u8]), Self::Error> {
             let (metadata, remaining) = Metadata::try_decode_from(bytes)?;

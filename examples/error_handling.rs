@@ -8,7 +8,7 @@
 //! - Validating data with EncodedBytes
 //! - Recovering from errors
 
-use multitrait::{EncodedBytes, Error, TryDecodeFrom};
+use multi_trait::{EncodedBytes, Error, TryDecodeFrom};
 
 fn main() {
     println!("=== Multitrait Error Handling Example ===\n");
@@ -215,7 +215,7 @@ fn inspect_error_source() {
 /// Helper function showing how to wrap multitrait errors in application-specific errors
 #[allow(dead_code)]
 mod application_errors {
-    use multitrait::Error as MultitraitError;
+    use multi_trait::Error as MultitraitError;
 
     #[derive(Debug)]
     pub enum AppError {
