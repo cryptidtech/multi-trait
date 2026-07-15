@@ -3,6 +3,7 @@
 //!
 //! This example demonstrates the core functionality of the multitrait crate:
 //! - Encoding values to bytes
+#![allow(clippy::unreadable_literal)]
 //! - Decoding bytes back to values
 //! - Sequential encoding and decoding
 //! - Using different encoding strategies
@@ -36,14 +37,14 @@ fn basic_encode_decode() {
     // Encode a simple value
     let value = 42u8;
     let encoded = value.encode_into();
-    println!("Original value: {}", value);
-    println!("Encoded bytes: {:?}", encoded);
+    println!("Original value: {value}");
+    println!("Encoded bytes: {encoded:?}");
     println!("Encoded length: {} byte(s)", encoded.len());
 
     // Decode it back
     let (decoded, remaining) = u8::try_decode_from(&encoded).unwrap();
-    println!("Decoded value: {}", decoded);
-    println!("Remaining bytes: {:?}", remaining);
+    println!("Decoded value: {decoded}");
+    println!("Remaining bytes: {remaining:?}");
     assert_eq!(value, decoded);
     assert!(remaining.is_empty());
 
@@ -66,7 +67,7 @@ fn sequential_operations() {
     println!("  - 1000 (u16)");
     println!("  - 100000 (u32)");
     println!("Total buffer size: {} bytes", buffer.len());
-    println!("Buffer contents: {:?}", buffer);
+    println!("Buffer contents: {buffer:?}");
 
     // Decode sequentially
     let (val1, rest) = u8::try_decode_from(&buffer).unwrap();
@@ -74,9 +75,9 @@ fn sequential_operations() {
     let (val3, rest) = u32::try_decode_from(rest).unwrap();
 
     println!("\nDecoded values:");
-    println!("  - {} (u8)", val1);
-    println!("  - {} (u16)", val2);
-    println!("  - {} (u32)", val3);
+    println!("  - {val1} (u8)");
+    println!("  - {val2} (u16)");
+    println!("  - {val3} (u32)");
 
     assert_eq!(val1, 42);
     assert_eq!(val2, 1000);
@@ -116,7 +117,7 @@ fn buffer_based_encoding() {
         slice = remaining;
         count += 1;
     }
-    println!("Successfully decoded and verified {} values", count);
+    println!("Successfully decoded and verified {count} values");
 
     println!();
 }
@@ -130,7 +131,7 @@ fn stack_based_encoding() {
     let value = 42u8;
     let (array, len) = value.encode_into_array();
 
-    println!("Encoded {} to stack array", value);
+    println!("Encoded {value} to stack array");
     println!("Array contents (first {} bytes): {:?}", len, &array[..len]);
     println!(
         "Maximum array size for u8: {} bytes",
@@ -187,7 +188,7 @@ fn varint_efficiency() {
         let encoded = value.encode_into();
         let hex_str: String = encoded
             .iter()
-            .map(|b| format!("{:02X}", b))
+            .map(|b| format!("{b:02X}"))
             .collect::<Vec<_>>()
             .join(" ");
         println!("{:>12} | {:>6} | {}", value, encoded.len(), hex_str);

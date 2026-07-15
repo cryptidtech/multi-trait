@@ -2,10 +2,11 @@
 //! Benchmarks for encoding and decoding operations
 //!
 //! Run with: `cargo bench`
+#![allow(clippy::cast_sign_loss, clippy::unreadable_literal)]
 
 use std::hint::black_box;
 
-use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
+use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use multi_trait::{EncodeInto, EncodeIntoArray, EncodeIntoBuffer, TryDecodeFrom};
 
 /// Benchmark encoding operations for various integer types
@@ -36,7 +37,7 @@ fn bench_encoding(c: &mut Criterion) {
     group.bench_function("u128_small", |b| b.iter(|| black_box(42u128).encode_into()));
 
     group.bench_function("u128_max", |b| {
-        b.iter(|| black_box(u128::MAX).encode_into())
+        b.iter(|| black_box(u128::MAX).encode_into());
     });
 
     // bool encoding
@@ -67,56 +68,56 @@ fn bench_decoding(c: &mut Criterion) {
 
     // u8 decoding
     group.bench_function("u8_small", |b| {
-        b.iter(|| u8::try_decode_from(black_box(&u8_small)).unwrap())
+        b.iter(|| u8::try_decode_from(black_box(&u8_small)).unwrap());
     });
 
     group.bench_function("u8_max", |b| {
-        b.iter(|| u8::try_decode_from(black_box(&u8_max)).unwrap())
+        b.iter(|| u8::try_decode_from(black_box(&u8_max)).unwrap());
     });
 
     // u16 decoding
     group.bench_function("u16_small", |b| {
-        b.iter(|| u16::try_decode_from(black_box(&u16_small)).unwrap())
+        b.iter(|| u16::try_decode_from(black_box(&u16_small)).unwrap());
     });
 
     group.bench_function("u16_max", |b| {
-        b.iter(|| u16::try_decode_from(black_box(&u16_max)).unwrap())
+        b.iter(|| u16::try_decode_from(black_box(&u16_max)).unwrap());
     });
 
     // u32 decoding
     group.bench_function("u32_small", |b| {
-        b.iter(|| u32::try_decode_from(black_box(&u32_small)).unwrap())
+        b.iter(|| u32::try_decode_from(black_box(&u32_small)).unwrap());
     });
 
     group.bench_function("u32_max", |b| {
-        b.iter(|| u32::try_decode_from(black_box(&u32_max)).unwrap())
+        b.iter(|| u32::try_decode_from(black_box(&u32_max)).unwrap());
     });
 
     // u64 decoding
     group.bench_function("u64_small", |b| {
-        b.iter(|| u64::try_decode_from(black_box(&u64_small)).unwrap())
+        b.iter(|| u64::try_decode_from(black_box(&u64_small)).unwrap());
     });
 
     group.bench_function("u64_max", |b| {
-        b.iter(|| u64::try_decode_from(black_box(&u64_max)).unwrap())
+        b.iter(|| u64::try_decode_from(black_box(&u64_max)).unwrap());
     });
 
     // u128 decoding
     group.bench_function("u128_small", |b| {
-        b.iter(|| u128::try_decode_from(black_box(&u128_small)).unwrap())
+        b.iter(|| u128::try_decode_from(black_box(&u128_small)).unwrap());
     });
 
     group.bench_function("u128_max", |b| {
-        b.iter(|| u128::try_decode_from(black_box(&u128_max)).unwrap())
+        b.iter(|| u128::try_decode_from(black_box(&u128_max)).unwrap());
     });
 
     // bool decoding
     group.bench_function("bool_true", |b| {
-        b.iter(|| bool::try_decode_from(black_box(&bool_true)).unwrap())
+        b.iter(|| bool::try_decode_from(black_box(&bool_true)).unwrap());
     });
 
     group.bench_function("bool_false", |b| {
-        b.iter(|| bool::try_decode_from(black_box(&bool_false)).unwrap())
+        b.iter(|| bool::try_decode_from(black_box(&bool_false)).unwrap());
     });
 
     group.finish();
@@ -132,7 +133,7 @@ fn bench_roundtrip(c: &mut Criterion) {
             let encoded = value.encode_into();
             let (decoded, _) = u8::try_decode_from(&encoded).unwrap();
             black_box(decoded)
-        })
+        });
     });
 
     group.bench_function("u16", |b| {
@@ -141,7 +142,7 @@ fn bench_roundtrip(c: &mut Criterion) {
             let encoded = value.encode_into();
             let (decoded, _) = u16::try_decode_from(&encoded).unwrap();
             black_box(decoded)
-        })
+        });
     });
 
     group.bench_function("u32", |b| {
@@ -150,7 +151,7 @@ fn bench_roundtrip(c: &mut Criterion) {
             let encoded = value.encode_into();
             let (decoded, _) = u32::try_decode_from(&encoded).unwrap();
             black_box(decoded)
-        })
+        });
     });
 
     group.bench_function("u64", |b| {
@@ -159,7 +160,7 @@ fn bench_roundtrip(c: &mut Criterion) {
             let encoded = value.encode_into();
             let (decoded, _) = u64::try_decode_from(&encoded).unwrap();
             black_box(decoded)
-        })
+        });
     });
 
     group.finish();
@@ -172,7 +173,7 @@ fn bench_encoding_value_sizes(c: &mut Criterion) {
     // Test encoding efficiency for different value ranges
     for &size in &[0, 127, 128, 16383, 16384, 65535] {
         group.bench_with_input(BenchmarkId::from_parameter(size), &size, |b, &val| {
-            b.iter(|| black_box(val as u32).encode_into())
+            b.iter(|| black_box(val as u32).encode_into());
         });
     }
 
@@ -190,7 +191,7 @@ fn bench_sequential(c: &mut Criterion) {
             buffer.extend_from_slice(&black_box(1000u16).encode_into());
             buffer.extend_from_slice(&black_box(100000u32).encode_into());
             black_box(buffer)
-        })
+        });
     });
 
     // Pre-encode for decode benchmark
@@ -206,7 +207,7 @@ fn bench_sequential(c: &mut Criterion) {
             let (v2, rest) = u16::try_decode_from(rest).unwrap();
             let (v3, _rest) = u32::try_decode_from(rest).unwrap();
             black_box((v1, v2, v3))
-        })
+        });
     });
 
     group.finish();
@@ -222,7 +223,7 @@ fn bench_buffer_encoding(c: &mut Criterion) {
             let mut buffer = Vec::new();
             black_box(42u8).encode_into_buffer(&mut buffer);
             black_box(buffer)
-        })
+        });
     });
 
     // u32 buffer encoding
@@ -231,7 +232,7 @@ fn bench_buffer_encoding(c: &mut Criterion) {
             let mut buffer = Vec::new();
             black_box(42u32).encode_into_buffer(&mut buffer);
             black_box(buffer)
-        })
+        });
     });
 
     // u64 buffer encoding
@@ -240,7 +241,7 @@ fn bench_buffer_encoding(c: &mut Criterion) {
             let mut buffer = Vec::new();
             black_box(u64::MAX).encode_into_buffer(&mut buffer);
             black_box(buffer)
-        })
+        });
     });
 
     group.finish();
@@ -257,7 +258,7 @@ fn bench_buffer_reuse(c: &mut Criterion) {
                 black_box(i).encode_into_buffer(&mut buffer);
             }
             black_box(buffer)
-        })
+        });
     });
 
     group.bench_function("mixed_types", |b| {
@@ -267,7 +268,7 @@ fn bench_buffer_reuse(c: &mut Criterion) {
             black_box(1000u16).encode_into_buffer(&mut buffer);
             black_box(100000u32).encode_into_buffer(&mut buffer);
             black_box(buffer)
-        })
+        });
     });
 
     group.finish();
@@ -279,29 +280,29 @@ fn bench_array_encoding(c: &mut Criterion) {
 
     // u8 array encoding
     group.bench_function("u8_small", |b| {
-        b.iter(|| black_box(42u8).encode_into_array())
+        b.iter(|| black_box(42u8).encode_into_array());
     });
 
     group.bench_function("u8_max", |b| {
-        b.iter(|| black_box(u8::MAX).encode_into_array())
+        b.iter(|| black_box(u8::MAX).encode_into_array());
     });
 
     // u32 array encoding
     group.bench_function("u32_small", |b| {
-        b.iter(|| black_box(42u32).encode_into_array())
+        b.iter(|| black_box(42u32).encode_into_array());
     });
 
     group.bench_function("u32_max", |b| {
-        b.iter(|| black_box(u32::MAX).encode_into_array())
+        b.iter(|| black_box(u32::MAX).encode_into_array());
     });
 
     // u64 array encoding
     group.bench_function("u64_small", |b| {
-        b.iter(|| black_box(42u64).encode_into_array())
+        b.iter(|| black_box(42u64).encode_into_array());
     });
 
     group.bench_function("u64_max", |b| {
-        b.iter(|| black_box(u64::MAX).encode_into_array())
+        b.iter(|| black_box(u64::MAX).encode_into_array());
     });
 
     group.finish();
@@ -321,7 +322,7 @@ fn bench_encoding_comparison(c: &mut Criterion) {
             let mut buffer = Vec::new();
             black_box(value).encode_into_buffer(&mut buffer);
             buffer
-        })
+        });
     });
 
     group.bench_function("encode_into_buffer_with_capacity", |b| {
@@ -329,11 +330,11 @@ fn bench_encoding_comparison(c: &mut Criterion) {
             let mut buffer = Vec::with_capacity(10);
             black_box(value).encode_into_buffer(&mut buffer);
             buffer
-        })
+        });
     });
 
     group.bench_function("encode_into_array", |b| {
-        b.iter(|| black_box(value).encode_into_array())
+        b.iter(|| black_box(value).encode_into_array());
     });
 
     group.finish();

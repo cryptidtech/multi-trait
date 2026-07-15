@@ -2,7 +2,7 @@
 /// Trait for types that have a null/sentinel value.
 ///
 /// This trait allows multiformats types to define a "null" or sentinel value,
-/// similar to Option::None but for types where a discriminated union isn't
+/// similar to `Option::None` but for types where a discriminated union isn't
 /// appropriate. Common examples include null CIDs, null signatures, or
 /// default/uninitialized identifiers.
 ///

@@ -134,7 +134,7 @@ pub trait EncodeIntoBuffer {
     fn encode_into_buffer(&self, buffer: &mut Vec<u8>);
 }
 
-/// Macro to implement EncodeIntoBuffer for unsigned integer types using varint encoding.
+/// Macro to implement `EncodeIntoBuffer` for unsigned integer types using varint encoding.
 ///
 /// This macro eliminates code duplication by generating identical implementations
 /// for different numeric types. Each implementation:
@@ -181,7 +181,7 @@ macro_rules! impl_encode_into_buffer {
 impl EncodeIntoBuffer for bool {
     #[inline]
     fn encode_into_buffer(&self, buffer: &mut Vec<u8>) {
-        buffer.push(if *self { 1 } else { 0 });
+        buffer.push(u8::from(*self));
     }
 }
 

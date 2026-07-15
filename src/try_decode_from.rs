@@ -87,6 +87,15 @@ use unsigned_varint::decode;
 /// - `bool`: Decodes 0 as false, non-zero as true
 /// - `u8`, `u16`, `u32`, `u64`, `u128`: Variable-length decoding
 /// - `usize`: Platform-dependent (32-bit or 64-bit)
+///
+/// # Length Bounds
+///
+/// Integer decoders delegate to the `unsigned-varint` crate, which enforces
+/// type-specific maximum byte counts (10 bytes for `u64`, 19 for `u128`).
+/// These bounds prevent unbounded varint expansion but do **not** cap the
+/// size of higher-level structures built on top of varints. Callers that
+/// decode length-prefixed payloads (e.g. `Varbytes` in `multi-util`) should
+/// enforce their own upper bound on the claimed length before allocating.
 pub trait TryDecodeFrom<'a>: Sized {
     /// The error type returned on decoding failure.
     ///
@@ -122,11 +131,11 @@ pub trait TryDecodeFrom<'a>: Sized {
     fn try_decode_from(bytes: &'a [u8]) -> Result<(Self, &'a [u8]), Self::Error>;
 }
 
-/// Macro to implement TryDecodeFrom for unsigned integer types using varint decoding.
+/// Macro to implement `TryDecodeFrom` for unsigned integer types using varint decoding.
 ///
 /// This macro eliminates code duplication by generating identical implementations
 /// for different numeric types. Each implementation:
-/// 1. Calls the appropriate decode function from unsigned_varint
+/// 1. Calls the appropriate decode function from `unsigned_varint`
 /// 2. Maps any decode error to a properly structured Error with source chain
 /// 3. Returns the decoded value and remaining bytes
 ///
@@ -155,6 +164,7 @@ macro_rules! impl_try_decode_from {
             impl<'a> TryDecodeFrom<'a> for $type {
                 type Error = Error;
 
+                #[inline]
                 fn try_decode_from(bytes: &'a [u8]) -> Result<(Self, &'a [u8]), Self::Error> {
                     decode::$decode_fn(bytes)
                         .map_err(|source| {
@@ -173,6 +183,7 @@ macro_rules! impl_try_decode_from {
 impl<'a> TryDecodeFrom<'a> for bool {
     type Error = Error;
 
+    #[inline]
     fn try_decode_from(bytes: &'a [u8]) -> Result<(Self, &'a [u8]), Self::Error> {
         let (v, ptr) = decode::u8(bytes).map_err(|source| {
             #[cfg(feature = "std")]
@@ -204,6 +215,7 @@ impl_try_decode_from! {
 impl<'a, const N: usize> TryDecodeFrom<'a> for [u8; N] {
     type Error = Error;
 
+    #[inline]
     fn try_decode_from(bytes: &'a [u8]) -> Result<([u8; N], &'a [u8]), Self::Error> {
         if bytes.len() < N {
             return Err(Error::InsufficientData {

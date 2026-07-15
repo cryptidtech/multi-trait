@@ -256,7 +256,7 @@
 //!   - Disable for `no_std` environments: `default-features = false`
 //!   - Requires `alloc` when disabled (for `Vec<u8>` support)
 //!
-//! ## no_std Support
+//! ## `no_std` Support
 //!
 //! This crate works in `no_std` environments with `alloc`:
 //!
@@ -272,6 +272,7 @@
 //! are generated at compile time with full type safety.
 #![warn(missing_docs)]
 #![deny(
+    unsafe_code,
     trivial_casts,
     trivial_numeric_casts,
     unused_import_braces,
@@ -286,7 +287,7 @@ extern crate alloc;
 pub mod error;
 pub use error::Error;
 
-/// EncodeInto trait
+/// `EncodeInto` trait
 pub mod enc_into;
 pub use enc_into::EncodeInto;
 
@@ -298,11 +299,11 @@ pub use enc_into_buffer::EncodeIntoBuffer;
 pub mod enc_into_array;
 pub use enc_into_array::EncodeIntoArray;
 
-/// Null and TryNull traits
+/// Null and `TryNull` traits
 pub mod null;
 pub use null::{Null, TryNull};
 
-/// TryDecodeFrom trait
+/// `TryDecodeFrom` trait
 pub mod try_decode_from;
 pub use try_decode_from::TryDecodeFrom;
 
@@ -320,6 +321,13 @@ pub mod prelude {
 
 #[cfg(test)]
 mod test {
+    #![allow(
+        clippy::cast_possible_truncation,
+        clippy::cast_sign_loss,
+        clippy::items_after_statements,
+        clippy::significant_drop_tightening,
+        clippy::needless_collect
+    )]
     use super::prelude::*;
 
     #[test]
@@ -387,7 +395,7 @@ mod test {
 
     impl Null for Foo {
         fn null() -> Self {
-            Foo(0)
+            Self(0)
         }
         fn is_null(&self) -> bool {
             self.0 == 0
@@ -398,7 +406,7 @@ mod test {
         type Error = &'static str;
 
         fn try_null() -> Result<Self, Self::Error> {
-            Ok(Foo(0))
+            Ok(Self(0))
         }
         fn is_null(&self) -> bool {
             self.0 == 0
@@ -582,7 +590,7 @@ mod test {
         for value in [0, 1, 127, 128, 255] {
             let encoded = value.encode_into();
             let (decoded, remaining) = u8::try_decode_from(&encoded).unwrap();
-            assert_eq!(decoded, value, "Round-trip failed for u8 value {}", value);
+            assert_eq!(decoded, value, "Round-trip failed for u8 value {value}");
             assert!(remaining.is_empty());
         }
     }
@@ -593,7 +601,7 @@ mod test {
         for value in [0, 1, 127, 128, 255, 256, 16383, 16384, 65535] {
             let encoded = value.encode_into();
             let (decoded, remaining) = u16::try_decode_from(&encoded).unwrap();
-            assert_eq!(decoded, value, "Round-trip failed for u16 value {}", value);
+            assert_eq!(decoded, value, "Round-trip failed for u16 value {value}");
             assert!(remaining.is_empty());
         }
     }
@@ -604,7 +612,7 @@ mod test {
         for value in [0, 1, 127, 128, 16384, 65536, u32::MAX] {
             let encoded = value.encode_into();
             let (decoded, remaining) = u32::try_decode_from(&encoded).unwrap();
-            assert_eq!(decoded, value, "Round-trip failed for u32 value {}", value);
+            assert_eq!(decoded, value, "Round-trip failed for u32 value {value}");
             assert!(remaining.is_empty());
         }
     }
@@ -612,10 +620,10 @@ mod test {
     #[test]
     fn test_roundtrip_u64_range() {
         // Test various u64 values
-        for value in [0, 1, 127, 128, 65536, u32::MAX as u64, u64::MAX] {
+        for value in [0, 1, 127, 128, 65536, u64::from(u32::MAX), u64::MAX] {
             let encoded = value.encode_into();
             let (decoded, remaining) = u64::try_decode_from(&encoded).unwrap();
-            assert_eq!(decoded, value, "Round-trip failed for u64 value {}", value);
+            assert_eq!(decoded, value, "Round-trip failed for u64 value {value}");
             assert!(remaining.is_empty());
         }
     }
@@ -625,7 +633,7 @@ mod test {
         for value in [true, false] {
             let encoded = value.encode_into();
             let (decoded, remaining) = bool::try_decode_from(&encoded).unwrap();
-            assert_eq!(decoded, value, "Round-trip failed for bool {}", value);
+            assert_eq!(decoded, value, "Round-trip failed for bool {value}");
             assert!(remaining.is_empty());
         }
     }
@@ -791,7 +799,7 @@ mod test {
         is_sync::<crate::Error>();
     }
 
-    /// Compile-time verification that EncodedBytes is Send + Sync
+    /// Compile-time verification that `EncodedBytes` is Send + Sync
     #[test]
     fn assert_encoded_bytes_send_sync() {
         fn is_send<T: Send>() {}
@@ -961,7 +969,7 @@ mod test {
 
         for bytes in nonzero_values {
             let (val, _) = bool::try_decode_from(&bytes).unwrap();
-            assert!(val, "Non-zero value {:?} should decode as true", bytes);
+            assert!(val, "Non-zero value {bytes:?} should decode as true");
         }
 
         // Zero should decode as false
@@ -1329,7 +1337,7 @@ mod test {
             let mut sum = 0u64;
             for encoded in rx {
                 let (value, _) = u32::try_decode_from(&encoded).unwrap();
-                sum += value as u64;
+                sum += u64::from(value);
             }
             sum
         });
@@ -1399,7 +1407,8 @@ mod test {
                 thread::spawn(move || {
                     let mut buffer = Vec::new();
                     for j in 0u8..255 {
-                        ((i * 255 + j as u32) % u16::MAX as u32).encode_into_buffer(&mut buffer);
+                        ((i * 255 + u32::from(j)) % u32::from(u16::MAX))
+                            .encode_into_buffer(&mut buffer);
                     }
                     buffer.len()
                 })

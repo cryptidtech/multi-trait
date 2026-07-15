@@ -123,7 +123,7 @@ pub trait EncodeIntoArray {
     ///
     /// Returns a tuple of:
     /// - A 19-byte array containing the encoded bytes (may have unused space)
-    /// - The actual length of the encoded data (≤ MAX_ENCODED_SIZE)
+    /// - The actual length of the encoded data (≤ `MAX_ENCODED_SIZE`)
     ///
     /// # Performance
     ///
@@ -141,7 +141,7 @@ pub trait EncodeIntoArray {
     fn encode_into_array(&self) -> ([u8; MAX_VARINT_SIZE], usize);
 }
 
-/// Macro to implement EncodeIntoArray for unsigned integer types using varint encoding.
+/// Macro to implement `EncodeIntoArray` for unsigned integer types using varint encoding.
 ///
 /// This macro eliminates code duplication by generating identical implementations
 /// for different numeric types. Each implementation:
@@ -202,7 +202,7 @@ impl EncodeIntoArray for bool {
     #[inline]
     fn encode_into_array(&self) -> ([u8; MAX_VARINT_SIZE], usize) {
         let mut result = [0u8; MAX_VARINT_SIZE];
-        result[0] = if *self { 1 } else { 0 };
+        result[0] = u8::from(*self);
         (result, 1)
     }
 }
@@ -226,7 +226,7 @@ impl_encode_into_array! {
 
 // usize is platform-dependent: use 10 bytes (64-bit) to be safe
 impl EncodeIntoArray for usize {
-    const MAX_ENCODED_SIZE: usize = 10;
+    const MAX_ENCODED_SIZE: Self = 10;
 
     #[inline]
     fn encode_into_array(&self) -> ([u8; MAX_VARINT_SIZE], usize) {

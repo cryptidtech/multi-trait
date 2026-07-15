@@ -1,9 +1,9 @@
 [![](https://img.shields.io/badge/made%20by-Cryptid%20Technologies-gold.svg?style=flat-square)][CRYPTID]
 [![](https://img.shields.io/badge/project-provenance-purple.svg?style=flat-square)][PROVENANCE]
 [![](https://img.shields.io/badge/project-multiformats-blue.svg?style=flat-square)][MULTIFORMATS]
-![](https://github.com/cryptidtech/multitrait/actions/workflows/rust.yml/badge.svg)
+![](https://github.com/cryptidtech/multi-trait/actions/workflows/rust.yml/badge.svg)
 
-# Multitrait
+# multi-trait
 
 A lightweight, high-performance Rust library providing common traits for implementing [multiformats](https://github.com/multiformats/multiformats) types with zero-copy decoding and flexible encoding strategies.
 
@@ -24,20 +24,20 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-multitrait = "1.0"
+multi-trait = "1.0"
 ```
 
 For `no_std` environments:
 
 ```toml
 [dependencies]
-multitrait = { version = "1.0", default-features = false }
+multi-trait = { version = "1.0", default-features = false }
 ```
 
 ## Quick Start
 
 ```rust
-use multitrait::{EncodeInto, TryDecodeFrom};
+use multi_trait::{EncodeInto, TryDecodeFrom};
 
 // Encoding: Convert a value to compact varint bytes
 let value = 42u32;
@@ -59,7 +59,7 @@ assert!(remaining.is_empty());
 Encode values into a compact varint `Vec<u8>`. Best for one-off encoding operations.
 
 ```rust
-use multitrait::EncodeInto;
+use multi_trait::EncodeInto;
 
 let value = 1000u16;
 let bytes = value.encode_into(); // Allocates new Vec<u8>
@@ -70,7 +70,7 @@ let bytes = value.encode_into(); // Allocates new Vec<u8>
 Zero-allocation encoding into an existing buffer. Best for encoding multiple values or hot paths.
 
 ```rust
-use multitrait::EncodeIntoBuffer;
+use multi_trait::EncodeIntoBuffer;
 
 let mut buffer = Vec::with_capacity(100);
 
@@ -87,7 +87,7 @@ println!("Encoded {} bytes total", buffer.len());
 Stack-based encoding for `no_std` environments. Returns a fixed-size array with the actual length.
 
 ```rust
-use multitrait::EncodeIntoArray;
+use multi_trait::EncodeIntoArray;
 
 let (array, len) = 42u8.encode_into_array();
 assert_eq!(&array[..len], &[42]);
@@ -103,7 +103,7 @@ assert_eq!(<u32 as EncodeIntoArray>::MAX_ENCODED_SIZE, 5);
 Fallibly decode values from byte slices with zero-copy semantics. Returns the decoded value and remaining unconsumed bytes.
 
 ```rust
-use multitrait::TryDecodeFrom;
+use multi_trait::TryDecodeFrom;
 
 let bytes = vec![0xFF, 0xFF, 0x03]; // Varint encoding of 65535
 let (value, remaining) = u16::try_decode_from(&bytes).unwrap();
@@ -125,7 +125,7 @@ assert_eq!((first, second, third), (1, 2, 3));
 Define and check for null/sentinel values.
 
 ```rust
-use multitrait::Null;
+use multi_trait::Null;
 
 struct MyId(u64);
 
@@ -151,7 +151,7 @@ assert!(!valid_id.is_null());
 Fallible version of `Null` for types requiring validation.
 
 ```rust
-use multitrait::TryNull;
+use multi_trait::TryNull;
 
 struct ValidatedId(u64);
 
@@ -175,7 +175,7 @@ impl TryNull for ValidatedId {
 A validated newtype for varint-encoded byte sequences. Provides compile-time guarantees that bytes represent valid encodings.
 
 ```rust
-use multitrait::EncodedBytes;
+use multi_trait::EncodedBytes;
 
 // Validation happens at construction
 let valid = vec![42u8];
@@ -197,7 +197,7 @@ fn process_encoded(data: EncodedBytes) {
 All decode operations return a `Result` with a structured `Error` type:
 
 ```rust
-use multitrait::{TryDecodeFrom, Error};
+use multi_trait::{TryDecodeFrom, Error};
 
 let truncated = vec![0xFF]; // Incomplete varint
 match u16::try_decode_from(&truncated) {
@@ -268,7 +268,7 @@ All these patterns work safely:
 ```rust
 use std::sync::Arc;
 use std::thread;
-use multitrait::{EncodeInto, TryDecodeFrom};
+use multi_trait::{EncodeInto, TryDecodeFrom};
 
 // Parallel encoding
 let handles: Vec<_> = (0..10)
@@ -301,7 +301,7 @@ This crate works in `no_std` environments with `alloc`:
 
 ```toml
 [dependencies]
-multitrait = { version = "1.0", default-features = false }
+multi-trait = { version = "1.0", default-features = false }
 ```
 
 Use `EncodeIntoArray` for heap-free encoding in embedded systems:
@@ -311,7 +311,7 @@ Use `EncodeIntoArray` for heap-free encoding in embedded systems:
 
 extern crate alloc;
 use alloc::vec::Vec;
-use multitrait::EncodeIntoArray;
+use multi_trait::EncodeIntoArray;
 
 // Stack-only encoding (no heap required for encoding)
 let (array, len) = 42u8.encode_into_array();
@@ -385,9 +385,9 @@ Contributions are welcome! Please ensure:
 
 ## Links
 
-- [Documentation](https://docs.rs/multitrait)
-- [Crates.io](https://crates.io/crates/multitrait)
-- [Repository](https://github.com/cryptidtech/multitrait)
+- [Documentation](https://docs.rs/multi-trait)
+- [Crates.io](https://crates.io/crates/multi-trait)
+- [Repository](https://github.com/cryptidtech/multi-trait)
 - [Multiformats](https://github.com/multiformats/multiformats/)
 
 [CRYPTID]: https://cryptid.tech/

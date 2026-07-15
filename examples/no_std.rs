@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
-//! no_std usage example
+//! `no_std` usage example
 //!
-//! This example demonstrates how to use the multitrait crate in a no_std
+//! This example demonstrates how to use the multitrait crate in a `no_std`
 //! environment. While this example file runs with std (since examples require it),
-//! it shows the patterns you would use in actual no_std code.
+#![allow(clippy::items_after_statements, clippy::unreadable_literal)]
+//! it shows the patterns you would use in actual `no_std` code.
 //!
-//! To use multitrait in a no_std environment:
+//! To use multitrait in a `no_std` environment:
 //!
 //! 1. In your Cargo.toml:
 //!    ```toml
@@ -46,7 +47,7 @@ fn main() {
 
 /// Example 1: Stack-based encoding (zero heap allocation)
 ///
-/// This is ideal for embedded systems and no_std environments where
+/// This is ideal for embedded systems and `no_std` environments where
 /// heap allocation should be avoided or is not available.
 fn stack_based_encoding() {
     println!("1. Stack-Based Encoding (Zero Heap)");
@@ -56,26 +57,26 @@ fn stack_based_encoding() {
     let value = 42u8;
     let (array, len) = value.encode_into_array();
 
-    println!("Encoded {} to stack array", value);
+    println!("Encoded {value} to stack array");
     println!("Used {} byte(s) out of maximum {}", len, array.len());
     println!("Array contents: {:?}", &array[..len]);
 
     // Decode from stack array
     let (decoded, _) = u8::try_decode_from(&array[..len]).unwrap();
-    println!("Decoded: {}", decoded);
+    println!("Decoded: {decoded}");
     assert_eq!(value, decoded);
 
     // Show different types
     println!("\nStack encoding for different types:");
 
     let (_array, len) = 1000u16.encode_into_array();
-    println!("  u16 (1000): {} byte(s)", len);
+    println!("  u16 (1000): {len} byte(s)");
 
     let (_array, len) = 100000u32.encode_into_array();
-    println!("  u32 (100000): {} byte(s)", len);
+    println!("  u32 (100000): {len} byte(s)");
 
     let (_array, len) = u64::MAX.encode_into_array();
-    println!("  u64::MAX: {} byte(s) (maximum for u64)", len);
+    println!("  u64::MAX: {len} byte(s) (maximum for u64)");
 
     println!();
 }
@@ -83,7 +84,7 @@ fn stack_based_encoding() {
 /// Example 2: Minimal heap usage
 ///
 /// When you need Vec but want to minimize allocations,
-/// use EncodeIntoBuffer with pre-allocated capacity.
+/// use `EncodeIntoBuffer` with pre-allocated capacity.
 fn minimal_heap_usage() {
     println!("2. Minimal Heap Usage");
     println!("---------------------");
@@ -93,7 +94,7 @@ fn minimal_heap_usage() {
     let mut buffer = Vec::with_capacity(100);
     let initial_capacity = buffer.capacity();
 
-    println!("Pre-allocated buffer capacity: {}", initial_capacity);
+    println!("Pre-allocated buffer capacity: {initial_capacity}");
 
     // Encode multiple values without reallocating
     for i in 0u16..30 {
@@ -114,7 +115,7 @@ fn minimal_heap_usage() {
         slice = remaining;
         count += 1;
     }
-    println!("Decoded {} values without allocation", count);
+    println!("Decoded {count} values without allocation");
 
     println!();
 }
@@ -132,18 +133,18 @@ fn fixed_size_buffers() {
     let mut buffer = [0u8; BUFFER_SIZE];
     let mut offset = 0;
 
-    println!("Fixed-size buffer: {} bytes", BUFFER_SIZE);
+    println!("Fixed-size buffer: {BUFFER_SIZE} bytes");
 
     // Encode values into the fixed buffer
     let values = [10u16, 20, 30, 40, 50];
-    for value in values.iter() {
+    for value in &values {
         let (array, len) = value.encode_into_array();
         buffer[offset..offset + len].copy_from_slice(&array[..len]);
         offset += len;
     }
 
     println!("Encoded {} values", values.len());
-    println!("Used {} bytes out of {} available", offset, BUFFER_SIZE);
+    println!("Used {offset} bytes out of {BUFFER_SIZE} available");
 
     // Decode from the fixed buffer
     let mut slice = &buffer[..offset];
@@ -154,7 +155,7 @@ fn fixed_size_buffers() {
         slice = remaining;
     }
 
-    println!("Decoded values: {:?}", decoded_values);
+    println!("Decoded values: {decoded_values:?}");
     assert_eq!(decoded_values.as_slice(), &values);
 
     println!();
@@ -163,7 +164,7 @@ fn fixed_size_buffers() {
 /// Example 4: Zero-allocation decoding
 ///
 /// Decoding never allocates - it only returns references to the input buffer.
-/// This is perfect for no_std and resource-constrained environments.
+/// This is perfect for `no_std` and resource-constrained environments.
 fn zero_allocation_decoding() {
     println!("4. Zero-Allocation Decoding");
     println!("----------------------------");
@@ -175,7 +176,7 @@ fn zero_allocation_decoding() {
     }
 
     println!("Encoded 10 values in {} bytes", data.len());
-    println!("Data: {:?}", data);
+    println!("Data: {data:?}");
 
     // Decode using only stack references - no allocation
     let mut slice = &data[..];
@@ -186,14 +187,14 @@ fn zero_allocation_decoding() {
     while !slice.is_empty() {
         // try_decode_from returns references, never allocates
         let (value, remaining) = u32::try_decode_from(slice).unwrap();
-        println!("  Value {}: {}", count, value);
-        sum += value as u64;
+        println!("  Value {count}: {value}");
+        sum += u64::from(value);
         slice = remaining;
         count += 1;
     }
 
-    println!("\nDecoded {} values", count);
-    println!("Sum: {}", sum);
+    println!("\nDecoded {count} values");
+    println!("Sum: {sum}");
 
     // Verify
     let expected_sum: u64 = (0..10).sum();
@@ -202,7 +203,7 @@ fn zero_allocation_decoding() {
     println!();
 }
 
-/// Example showing how to implement custom types for no_std
+/// Example showing how to implement custom types for `no_std`
 #[allow(dead_code)]
 mod no_std_custom_types {
     // In actual no_std code:
@@ -210,7 +211,7 @@ mod no_std_custom_types {
     use multi_trait::{EncodeIntoArray, EncodeIntoBuffer, TryDecodeFrom};
 
     /// A custom type that uses only stack encoding
-    #[derive(Debug, PartialEq)]
+    #[derive(Debug, PartialEq, Eq)]
     pub struct SensorReading {
         pub sensor_id: u8,
         pub value: u16,
@@ -233,7 +234,7 @@ mod no_std_custom_types {
         pub fn decode_from(bytes: &[u8]) -> Result<(Self, &[u8]), multi_trait::Error> {
             let (sensor_id, remaining) = u8::try_decode_from(bytes)?;
             let (value, remaining) = u16::try_decode_from(remaining)?;
-            Ok((SensorReading { sensor_id, value }, remaining))
+            Ok((Self { sensor_id, value }, remaining))
         }
 
         /// Encode into existing buffer (minimal allocation)

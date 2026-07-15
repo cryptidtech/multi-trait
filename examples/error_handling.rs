@@ -5,7 +5,7 @@
 //! the multitrait crate, including:
 //! - Handling decode errors
 //! - Inspecting error sources
-//! - Validating data with EncodedBytes
+//! - Validating data with `EncodedBytes`
 //! - Recovering from errors
 
 use multi_trait::{EncodedBytes, Error, TryDecodeFrom};
@@ -41,10 +41,10 @@ fn handle_empty_input() {
 
     match u32::try_decode_from(empty) {
         Ok((value, _)) => {
-            println!("Unexpectedly decoded: {}", value);
+            println!("Unexpectedly decoded: {value}");
         }
         Err(e) => {
-            println!("✓ Correctly caught error: {}", e);
+            println!("✓ Correctly caught error: {e}");
             println!("  Error type: UnsignedVarintDecode");
         }
     }
@@ -61,14 +61,14 @@ fn handle_truncated_varint() {
     // but there are no more bytes - this is truncated
     let truncated = vec![0x80];
 
-    println!("Attempting to decode truncated varint: {:?}", truncated);
+    println!("Attempting to decode truncated varint: {truncated:?}");
 
     match u16::try_decode_from(&truncated) {
         Ok((value, _)) => {
-            println!("Unexpectedly decoded: {}", value);
+            println!("Unexpectedly decoded: {value}");
         }
         Err(e) => {
-            println!("✓ Correctly caught error: {}", e);
+            println!("✓ Correctly caught error: {e}");
             println!("  This protects against malformed data");
         }
     }
@@ -88,10 +88,10 @@ fn handle_invalid_encoding() {
 
     match u64::try_decode_from(&invalid) {
         Ok((value, _)) => {
-            println!("Unexpectedly decoded: {}", value);
+            println!("Unexpectedly decoded: {value}");
         }
         Err(e) => {
-            println!("✓ Correctly caught error: {}", e);
+            println!("✓ Correctly caught error: {e}");
             println!("  This protects against overflow attacks");
         }
     }
@@ -99,7 +99,7 @@ fn handle_invalid_encoding() {
     println!();
 }
 
-/// Example 4: Using EncodedBytes for validation
+/// Example 4: Using `EncodedBytes` for validation
 fn use_validated_bytes() {
     println!("4. Using EncodedBytes for Validation");
     println!("-------------------------------------");
@@ -108,11 +108,11 @@ fn use_validated_bytes() {
     let valid_data = vec![42u8];
     match EncodedBytes::try_from(valid_data.clone()) {
         Ok(encoded) => {
-            println!("✓ Valid data accepted: {:?}", valid_data);
+            println!("✓ Valid data accepted: {valid_data:?}");
             println!("  EncodedBytes length: {}", encoded.len());
         }
         Err(e) => {
-            println!("Unexpectedly rejected: {}", e);
+            println!("Unexpectedly rejected: {e}");
         }
     }
 
@@ -123,7 +123,7 @@ fn use_validated_bytes() {
             println!("Unexpectedly accepted empty data");
         }
         Err(e) => {
-            println!("✓ Empty data rejected: {}", e);
+            println!("✓ Empty data rejected: {e}");
         }
     }
 
@@ -134,8 +134,8 @@ fn use_validated_bytes() {
             println!("Unexpectedly accepted truncated data");
         }
         Err(e) => {
-            println!("✓ Truncated data rejected: {}", e);
-            println!("  Attempted data: {:?}", truncated_data);
+            println!("✓ Truncated data rejected: {e}");
+            println!("  Attempted data: {truncated_data:?}");
         }
     }
 
@@ -150,24 +150,21 @@ fn error_recovery() {
     // Try multiple decoding strategies
     let data = vec![0xFF, 0xFF, 0x03]; // Valid u16, might fail for u8
 
-    println!("Attempting to decode {:?}...", data);
+    println!("Attempting to decode {data:?}...");
 
     // Try as u8 first
-    match u8::try_decode_from(&data) {
-        Ok((value, _)) => {
-            println!("Decoded as u8: {}", value);
-        }
-        Err(_) => {
-            println!("Failed to decode as u8, trying u16...");
+    if let Ok((value, _)) = u8::try_decode_from(&data) {
+        println!("Decoded as u8: {value}");
+    } else {
+        println!("Failed to decode as u8, trying u16...");
 
-            // Fall back to u16
-            match u16::try_decode_from(&data) {
-                Ok((value, _)) => {
-                    println!("✓ Successfully decoded as u16: {}", value);
-                }
-                Err(e) => {
-                    println!("Failed to decode as u16: {}", e);
-                }
+        // Fall back to u16
+        match u16::try_decode_from(&data) {
+            Ok((value, _)) => {
+                println!("✓ Successfully decoded as u16: {value}");
+            }
+            Err(e) => {
+                println!("Failed to decode as u16: {e}");
             }
         }
     }
@@ -184,16 +181,16 @@ fn inspect_error_source() {
 
     match u32::try_decode_from(&invalid) {
         Ok((value, _)) => {
-            println!("Unexpectedly decoded: {}", value);
+            println!("Unexpectedly decoded: {value}");
         }
         Err(e) => {
-            println!("Error occurred: {}", e);
+            println!("Error occurred: {e}");
 
             // Pattern match on specific error types
             match &e {
                 Error::UnsignedVarintDecode { source } => {
                     println!("  Error type: UnsignedVarintDecode");
-                    println!("  Source error: {}", source);
+                    println!("  Source error: {source}");
                     println!("  This error comes from the unsigned-varint crate");
                 }
                 // Error is marked #[non_exhaustive] so we need a catch-all
@@ -204,7 +201,7 @@ fn inspect_error_source() {
 
             // Check if error has a source (for error chaining)
             if let Some(source) = std::error::Error::source(&e) {
-                println!("  Error source chain: {}", source);
+                println!("  Error source chain: {source}");
             }
         }
     }
@@ -226,8 +223,8 @@ mod application_errors {
     impl std::fmt::Display for AppError {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
-                AppError::InvalidData(e) => write!(f, "Invalid data: {}", e),
-                AppError::Other(s) => write!(f, "{}", s),
+                Self::InvalidData(e) => write!(f, "Invalid data: {e}"),
+                Self::Other(s) => write!(f, "{s}"),
             }
         }
     }
@@ -235,15 +232,15 @@ mod application_errors {
     impl std::error::Error for AppError {
         fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
             match self {
-                AppError::InvalidData(e) => Some(e),
-                AppError::Other(_) => None,
+                Self::InvalidData(e) => Some(e),
+                Self::Other(_) => None,
             }
         }
     }
 
     impl From<MultitraitError> for AppError {
         fn from(e: MultitraitError) -> Self {
-            AppError::InvalidData(e)
+            Self::InvalidData(e)
         }
     }
 }

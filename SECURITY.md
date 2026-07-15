@@ -8,7 +8,7 @@ The `multitrait` crate provides foundational traits for encoding and decoding mu
 
 ### Memory Safety
 
-- **No `unsafe` code**: The crate contains zero unsafe blocks, relying entirely on safe Rust abstractions
+- **No `unsafe` code**: The crate enforces `#![deny(unsafe_code)]` at the crate root, relying entirely on safe Rust abstractions
 - **No buffer overflows**: All buffer operations use safe indexing and slicing
 - **No use-after-free**: Lifetimes ensure references remain valid
 - **No data races**: All types are `Send + Sync` with no mutable shared state
@@ -72,7 +72,7 @@ This crate does NOT protect against:
 
 ✅ **No panics on invalid input**: All error conditions return `Result`
 ✅ **No buffer overflows**: All indexing is bounds-checked
-✅ **No undefined behavior**: Zero unsafe code
+✅ **No undefined behavior**: `#![deny(unsafe_code)]` forbids unsafe code
 ✅ **Deterministic behavior**: Same input always produces same output
 ✅ **Error transparency**: All errors provide source chains for debugging
 ✅ **Type safety**: Invalid states are unrepresentable
@@ -227,7 +227,7 @@ This crate assumes callers will:
 
 ### For Contributors
 
-1. **Never use `unsafe`**: This crate has zero unsafe code by policy
+1. **Never use `unsafe`**: This crate enforces `#![deny(unsafe_code)]` by policy
 2. **Add tests for new features**: Include security test cases
 3. **Document security implications**: Explain potential misuse
 4. **Consider DoS vectors**: Every new feature should be analyzed for DoS potential

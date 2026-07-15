@@ -3,9 +3,14 @@
 //!
 //! This example demonstrates how to implement multitrait traits for your
 //! custom types, including:
-//! - Implementing EncodeInto for custom types
-//! - Implementing TryDecodeFrom for custom types
-//! - Implementing Null and TryNull for custom types
+#![allow(
+    clippy::items_after_statements,
+    clippy::struct_field_names,
+    clippy::unreadable_literal
+)]
+//! - Implementing `EncodeInto` for custom types
+//! - Implementing `TryDecodeFrom` for custom types
+//! - Implementing Null and `TryNull` for custom types
 //! - Creating composable encoding/decoding for complex structures
 
 use multi_trait::{EncodeInto, EncodeIntoBuffer, Null, TryDecodeFrom, TryNull};
@@ -51,19 +56,19 @@ fn simple_newtype() {
 
         fn try_decode_from(bytes: &'a [u8]) -> Result<(Self, &'a [u8]), Self::Error> {
             let (id, remaining) = u64::try_decode_from(bytes)?;
-            Ok((UserId(id), remaining))
+            Ok((Self(id), remaining))
         }
     }
 
     // Use the custom type
     let user_id = UserId(12345);
-    println!("Original UserId: {:?}", user_id);
+    println!("Original UserId: {user_id:?}");
 
     let encoded = user_id.encode_into();
-    println!("Encoded: {:?}", encoded);
+    println!("Encoded: {encoded:?}");
 
     let (decoded, _) = UserId::try_decode_from(&encoded).unwrap();
-    println!("Decoded: {:?}", decoded);
+    println!("Decoded: {decoded:?}");
 
     assert_eq!(user_id, decoded);
 
@@ -103,7 +108,7 @@ fn multi_field_struct() {
             let (age, remaining) = u8::try_decode_from(remaining)?;
             let (score, remaining) = u16::try_decode_from(remaining)?;
 
-            Ok((Person { id, age, score }, remaining))
+            Ok((Self { id, age, score }, remaining))
         }
     }
 
@@ -113,14 +118,14 @@ fn multi_field_struct() {
         age: 25,
         score: 9500,
     };
-    println!("Original Person: {:?}", person);
+    println!("Original Person: {person:?}");
 
     let encoded = person.encode_into();
     println!("Encoded ({} bytes): {:?}", encoded.len(), encoded);
 
     let (decoded, remaining) = Person::try_decode_from(&encoded).unwrap();
-    println!("Decoded: {:?}", decoded);
-    println!("Remaining bytes: {:?}", remaining);
+    println!("Decoded: {decoded:?}");
+    println!("Remaining bytes: {remaining:?}");
 
     assert_eq!(person, decoded);
 
@@ -138,7 +143,7 @@ fn null_trait_example() {
 
     impl Null for SessionId {
         fn null() -> Self {
-            SessionId(0)
+            Self(0)
         }
 
         fn is_null(&self) -> bool {
@@ -167,7 +172,7 @@ fn null_trait_example() {
     println!();
 }
 
-/// Example 4: Implementing TryNull trait
+/// Example 4: Implementing `TryNull` trait
 fn try_null_trait_example() {
     println!("4. Implementing TryNull Trait");
     println!("------------------------------");
@@ -181,7 +186,7 @@ fn try_null_trait_example() {
 
         fn try_null() -> Result<Self, Self::Error> {
             // Perform validation even for null value
-            Ok(ValidatedToken(String::from("NULL_TOKEN")))
+            Ok(Self(String::from("NULL_TOKEN")))
         }
 
         fn is_null(&self) -> bool {
@@ -192,12 +197,12 @@ fn try_null_trait_example() {
     // Create null token
     match ValidatedToken::try_null() {
         Ok(token) => {
-            println!("Created null token: {:?}", token);
+            println!("Created null token: {token:?}");
             println!("Is null: {}", token.is_null());
             assert!(token.is_null());
         }
         Err(e) => {
-            println!("Failed to create null token: {}", e);
+            println!("Failed to create null token: {e}");
         }
     }
 
@@ -249,7 +254,7 @@ fn nested_structures() {
         fn try_decode_from(bytes: &'a [u8]) -> Result<(Self, &'a [u8]), Self::Error> {
             let (version, remaining) = u8::try_decode_from(bytes)?;
             let (flags, remaining) = u16::try_decode_from(remaining)?;
-            Ok((Metadata { version, flags }, remaining))
+            Ok((Self { version, flags }, remaining))
         }
     }
 
@@ -275,7 +280,7 @@ fn nested_structures() {
             let (message_type, remaining) = u8::try_decode_from(remaining)?;
 
             Ok((
-                Message {
+                Self {
                     metadata,
                     sender_id,
                     message_type,
@@ -295,14 +300,14 @@ fn nested_structures() {
         message_type: 42,
     };
 
-    println!("Original message: {:#?}", message);
+    println!("Original message: {message:#?}");
 
     let encoded = message.encode_into();
     println!("Encoded ({} bytes): {:?}", encoded.len(), encoded);
 
     let (decoded, remaining) = Message::try_decode_from(&encoded).unwrap();
-    println!("Decoded message: {:#?}", decoded);
-    println!("Remaining bytes: {:?}", remaining);
+    println!("Decoded message: {decoded:#?}");
+    println!("Remaining bytes: {remaining:?}");
 
     assert_eq!(message, decoded);
 

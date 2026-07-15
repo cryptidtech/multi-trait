@@ -105,6 +105,7 @@ impl EncodedBytes {
     /// assert_eq!(encoded.len(), 1);
     /// ```
     #[inline]
+    #[must_use]
     pub fn len(&self) -> usize {
         self.0.len()
     }
@@ -124,6 +125,7 @@ impl EncodedBytes {
     /// assert!(!encoded.is_empty());
     /// ```
     #[inline]
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
@@ -139,6 +141,7 @@ impl EncodedBytes {
     /// assert_eq!(encoded.as_bytes(), &[42]);
     /// ```
     #[inline]
+    #[must_use]
     pub fn as_bytes(&self) -> &[u8] {
         &self.0
     }
@@ -157,6 +160,7 @@ impl EncodedBytes {
     /// assert_eq!(bytes, vec![42]);
     /// ```
     #[inline]
+    #[must_use]
     pub fn into_vec(self) -> Vec<u8> {
         self.0
     }
@@ -230,7 +234,7 @@ impl TryFrom<Vec<u8>> for EncodedBytes {
             });
         }
 
-        Ok(EncodedBytes(bytes))
+        Ok(Self(bytes))
     }
 }
 
@@ -293,15 +297,12 @@ impl Deref for EncodedBytes {
     }
 }
 
-// Explicitly document Send + Sync bounds
-//
-// SAFETY: EncodedBytes is Send + Sync because:
-// 1. It contains only a Vec<u8>, which is Send + Sync
-// 2. The data is immutable after validation
-// 3. No interior mutability is used
-// 4. All validation happens at construction time
-unsafe impl Send for EncodedBytes {}
-unsafe impl Sync for EncodedBytes {}
+// `EncodedBytes` is `Send + Sync` automatically because its only field is a
+// `Vec<u8>` (which is `Send + Sync`), the data is immutable after
+// construction, and there is no interior mutability. No `unsafe impl` is
+// required; this is documented here because an earlier revision carried
+// redundant `unsafe impl Send/Sync` that violated the crate's
+// `#![deny(unsafe_code)]` policy.
 
 #[cfg(test)]
 mod tests {
@@ -384,7 +385,7 @@ mod tests {
     #[test]
     fn test_debug() {
         let encoded = EncodedBytes::new(&[42]).unwrap();
-        let debug_str = format!("{:?}", encoded);
+        let debug_str = format!("{encoded:?}");
         assert!(debug_str.contains("EncodedBytes"));
     }
 

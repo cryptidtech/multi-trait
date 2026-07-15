@@ -82,7 +82,7 @@ pub trait EncodeInto {
     fn encode_into(&self) -> Vec<u8>;
 }
 
-/// Macro to implement EncodeInto for unsigned integer types using varint encoding.
+/// Macro to implement `EncodeInto` for unsigned integer types using varint encoding.
 ///
 /// This macro eliminates code duplication by generating identical implementations
 /// for different numeric types. Each implementation:
@@ -109,6 +109,7 @@ macro_rules! impl_encode_into {
         $(
             #[doc = concat!("Encode a ", stringify!($type), " into a compact varuint `Vec<u8>`")]
             impl EncodeInto for $type {
+                #[inline]
                 fn encode_into(&self) -> Vec<u8> {
                     // Create appropriate buffer for this type
                     let mut buf = encode::$buffer_fn();
@@ -126,11 +127,9 @@ macro_rules! impl_encode_into {
 
 /// Encode a bool into a compact varuint `Vec<u8>`
 impl EncodeInto for bool {
+    #[inline]
     fn encode_into(&self) -> Vec<u8> {
-        match *self {
-            true => vec![1u8],
-            false => vec![0u8],
-        }
+        if *self { vec![1u8] } else { vec![0u8] }
     }
 }
 
@@ -146,6 +145,7 @@ impl_encode_into! {
 
 /// Encode a fixed-length byte array as raw bytes (used for BLS share identifiers).
 impl<const N: usize> EncodeInto for [u8; N] {
+    #[inline]
     fn encode_into(&self) -> Vec<u8> {
         self.as_slice().to_vec()
     }
