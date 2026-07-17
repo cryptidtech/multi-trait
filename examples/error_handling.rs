@@ -2,7 +2,7 @@
 //! Error handling example
 //!
 //! This example demonstrates proper error handling patterns when using
-//! the multitrait crate, including:
+//! the multi-trait crate, including:
 //! - Handling decode errors
 //! - Inspecting error sources
 //! - Validating data with `EncodedBytes`
@@ -209,7 +209,7 @@ fn inspect_error_source() {
     println!();
 }
 
-/// Helper function showing how to wrap multitrait errors in application-specific errors
+/// Helper function showing how to wrap multi-trait errors in application-specific errors
 #[allow(dead_code)]
 mod application_errors {
     use multi_trait::Error as MultitraitError;

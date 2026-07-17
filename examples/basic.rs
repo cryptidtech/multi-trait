@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Basic encoding and decoding example
 //!
-//! This example demonstrates the core functionality of the multitrait crate:
+//! This example demonstrates the core functionality of the multi-trait crate:
 //! - Encoding values to bytes
 #![allow(clippy::unreadable_literal)]
 //! - Decoding bytes back to values

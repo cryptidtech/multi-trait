@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 //! Custom type implementation example
 //!
-//! This example demonstrates how to implement multitrait traits for your
+//! This example demonstrates how to implement multi-trait traits for your
 //! custom types, including:
 #![allow(
     clippy::items_after_statements,

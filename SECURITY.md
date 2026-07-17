@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `multitrait` crate provides foundational traits for encoding and decoding multiformats types using unsigned varint encoding. This document outlines the security properties, threat model, and guarantees of this crate.
+The `multi-trait` crate provides foundational traits for encoding and decoding multiformats types using unsigned varint encoding. This document outlines the security properties, threat model, and guarantees of this crate.
 
 ## Security Properties
 
