@@ -262,7 +262,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! multitrait = { version = "1.0", default-features = false }
+//! multi-trait = { version = "1.0", default-features = false }
 //! ```
 //!
 //! ## Implementation Details

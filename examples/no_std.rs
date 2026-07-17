@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
 //! `no_std` usage example
 //!
-//! This example demonstrates how to use the multitrait crate in a `no_std`
+//! This example demonstrates how to use the multi-trait crate in a `no_std`
 //! environment. While this example file runs with std (since examples require it),
 #![allow(clippy::items_after_statements, clippy::unreadable_literal)]
 //! it shows the patterns you would use in actual `no_std` code.
 //!
-//! To use multitrait in a `no_std` environment:
+//! To use multi-trait in a `no_std` environment:
 //!
 //! 1. In your Cargo.toml:
 //!    ```toml
 //!    [dependencies]
-//!    multitrait = { version = "1.0", default-features = false }
+//!    multi-trait = { version = "1.0", default-features = false }
 //!    ```
 //!
 //! 2. In your code:
