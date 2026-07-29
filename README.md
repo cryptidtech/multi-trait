@@ -5,46 +5,50 @@
 
 # multi-trait
 
-A lightweight, high-performance Rust library providing common traits for implementing [multiformats](https://github.com/multiformats/multiformats) types with zero-copy decoding and flexible encoding strategies.
+Common traits for multiformats types in Rust. The crate gives encoding,
+decoding, and null value traits with zero-copy decoding and `no_std` support.
 
 ## Features
 
-- **🚀 High Performance**: Optimized varint encoding with minimal allocations
-- **📦 Zero-Copy Decoding**: Parse data without unnecessary copying
-- **🎯 Type Safety**: Validated newtypes for compile-time guarantees
-- **🔧 Flexible Encoding**: Three encoding strategies for different use cases
-- **🌐 no_std Support**: Works in embedded and constrained environments
-- **🧵 Thread-Safe**: All traits are `Send + Sync` safe
-- **📝 Well-Documented**: Comprehensive documentation with examples
-- **✅ Thoroughly Tested**: 150+ tests including property-based and concurrency tests
+- Varint encoding with minimal allocations.
+- Zero-copy decoding. `TryDecodeFrom` returns the remaining bytes.
+- Zero-allocation encoding. `EncodeIntoBuffer` reuses an existing buffer.
+- Stack-based encoding. `EncodeIntoArray` for `no_std` and embedded systems.
+- `no_std` support with `alloc`.
+- Validated newtype. `EncodedBytes` gives type-level guarantees.
+- `#![deny(unsafe_code)]` set at the crate root.
+- All types are `Send + Sync`.
+- 155 tests: unit, property-based, security, concurrency, and round-trip.
 
-## Installation
+## Install
 
 Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-multi-trait = "1.0"
+multi-trait = "1.1"
 ```
 
 For `no_std` environments:
 
 ```toml
 [dependencies]
-multi-trait = { version = "1.0", default-features = false }
+multi-trait = { version = "1.1", default-features = false }
 ```
+
+MSRV: Rust 1.85 (Edition 2024).
 
 ## Quick Start
 
 ```rust
 use multi_trait::{EncodeInto, TryDecodeFrom};
 
-// Encoding: Convert a value to compact varint bytes
+// Encode a value to varint bytes
 let value = 42u32;
 let encoded = value.encode_into();
 println!("Encoded {} as {:?}", value, encoded);
 
-// Decoding: Parse bytes back to original value
+// Decode the bytes back to the value
 let (decoded, remaining) = u32::try_decode_from(&encoded).unwrap();
 assert_eq!(decoded, value);
 assert!(remaining.is_empty());
@@ -56,35 +60,36 @@ assert!(remaining.is_empty());
 
 #### `EncodeInto`
 
-Encode values into a compact varint `Vec<u8>`. Best for one-off encoding operations.
+Encode a value into a varint `Vec<u8>`. Use this for one-off encoding.
 
 ```rust
 use multi_trait::EncodeInto;
 
 let value = 1000u16;
-let bytes = value.encode_into(); // Allocates new Vec<u8>
+let bytes = value.encode_into(); // Allocates a new Vec<u8>
 ```
 
 #### `EncodeIntoBuffer`
 
-Zero-allocation encoding into an existing buffer. Best for encoding multiple values or hot paths.
+Encode values into an existing buffer with no allocation. Use this in hot
+paths or when you encode multiple values.
 
 ```rust
 use multi_trait::EncodeIntoBuffer;
 
 let mut buffer = Vec::with_capacity(100);
 
-// Encode multiple values with minimal allocations
 42u8.encode_into_buffer(&mut buffer);
 1000u16.encode_into_buffer(&mut buffer);
-100000u32.encode_into_buffer(&mut buffer);
+100_000u32.encode_into_buffer(&mut buffer);
 
 println!("Encoded {} bytes total", buffer.len());
 ```
 
 #### `EncodeIntoArray`
 
-Stack-based encoding for `no_std` environments. Returns a fixed-size array with the actual length.
+Encode a value into a stack-allocated array. Use this in `no_std` or
+real-time systems.
 
 ```rust
 use multi_trait::EncodeIntoArray;
@@ -92,7 +97,6 @@ use multi_trait::EncodeIntoArray;
 let (array, len) = 42u8.encode_into_array();
 assert_eq!(&array[..len], &[42]);
 
-// Maximum sizes known at compile time
 assert_eq!(<u32 as EncodeIntoArray>::MAX_ENCODED_SIZE, 5);
 ```
 
@@ -100,7 +104,8 @@ assert_eq!(<u32 as EncodeIntoArray>::MAX_ENCODED_SIZE, 5);
 
 #### `TryDecodeFrom`
 
-Fallibly decode values from byte slices with zero-copy semantics. Returns the decoded value and remaining unconsumed bytes.
+Decode a value from a byte slice. Returns the value and the remaining bytes.
+No allocation occurs.
 
 ```rust
 use multi_trait::TryDecodeFrom;
@@ -110,7 +115,7 @@ let (value, remaining) = u16::try_decode_from(&bytes).unwrap();
 assert_eq!(value, 65535);
 assert!(remaining.is_empty());
 
-// Sequential decoding from one buffer
+// Decode multiple values from one buffer
 let bytes = vec![0x01, 0x02, 0x03];
 let (first, rest) = u8::try_decode_from(&bytes).unwrap();
 let (second, rest) = u8::try_decode_from(rest).unwrap();
@@ -122,7 +127,7 @@ assert_eq!((first, second, third), (1, 2, 3));
 
 #### `Null`
 
-Define and check for null/sentinel values.
+Define and check for a null or sentinel value.
 
 ```rust
 use multi_trait::Null;
@@ -148,7 +153,7 @@ assert!(!valid_id.is_null());
 
 #### `TryNull`
 
-Fallible version of `Null` for types requiring validation.
+Fallible version of `Null`. Use it for types that need validation.
 
 ```rust
 use multi_trait::TryNull;
@@ -172,29 +177,27 @@ impl TryNull for ValidatedId {
 
 #### `EncodedBytes`
 
-A validated newtype for varint-encoded byte sequences. Provides compile-time guarantees that bytes represent valid encodings.
+A validated newtype for varint-encoded byte sequences. Construction checks
+that the bytes are a valid encoding.
 
 ```rust
 use multi_trait::EncodedBytes;
 
-// Validation happens at construction
 let valid = vec![42u8];
 let encoded = EncodedBytes::try_from(valid).unwrap();
 
-// Invalid data is rejected
 let invalid = vec![0x80]; // Truncated varint
 assert!(EncodedBytes::try_from(invalid).is_err());
 
-// Type system ensures valid data
 fn process_encoded(data: EncodedBytes) {
-    // No need to validate - type guarantees validity
+    // The type guarantees the data is valid
     println!("Processing {} bytes", data.len());
 }
 ```
 
 ## Error Handling
 
-All decode operations return a `Result` with a structured `Error` type:
+All decode operations return `Result` with a structured `Error` type:
 
 ```rust
 use multi_trait::{TryDecodeFrom, Error};
@@ -202,8 +205,8 @@ use multi_trait::{TryDecodeFrom, Error};
 let truncated = vec![0xFF]; // Incomplete varint
 match u16::try_decode_from(&truncated) {
     Ok((value, _)) => println!("Decoded: {}", value),
-    Err(Error::UnsignedVarintDecode { source }) => {
-        eprintln!("Decode failed: {}", source);
+    Err(Error::UnsignedVarintDecode { .. }) => {
+        eprintln!("Decode failed");
     }
     Err(e) => eprintln!("Other error: {}", e),
 }
@@ -211,97 +214,67 @@ match u16::try_decode_from(&truncated) {
 
 ### Error Types
 
-- `Error::UnsignedVarintDecode`: Varint decoding failed (truncated data, invalid encoding, etc.)
+The `Error` enum is `#[non_exhaustive]`. It has these variants:
 
-All errors include source chains for debugging and support backtraces when the `std` feature is enabled.
+- `UnsignedVarintDecode`: Varint decoding failed. The cause can be
+  truncated data or an invalid encoding.
+- `InsufficientData`: The input slice does not have enough bytes to decode
+  the requested type.
+- `InvalidEncoding`: The data is structurally invalid. This variant is
+  for future use and custom validation.
+
+All errors give source chains for debugging. Backtraces are available when
+the `std` feature is on.
 
 ## Performance Guide
 
 ### Encoding Performance
 
-Choose the right encoding strategy for your use case:
+Pick the encoding strategy for your use case:
 
-1. **`EncodeInto`** - Good for one-off encodings
-   - Single allocation per call
-   - Simple API
-   - Use when encoding individual values
-
-2. **`EncodeIntoBuffer`** - Best for multiple values
-   - Zero allocations when buffer has capacity
-   - Reusable buffer
-   - Use in hot paths or when encoding multiple values
-
-3. **`EncodeIntoArray`** - Best for embedded systems
-   - Zero heap allocations (stack only)
-   - Deterministic performance
-   - Use in `no_std` or real-time systems
+1. `EncodeInto` — One allocation per call. Use this for one-off encodings.
+2. `EncodeIntoBuffer` — Zero allocations when the buffer has capacity. Use
+   this in hot paths or when you encode multiple values.
+3. `EncodeIntoArray` — Zero heap allocations. Use this in `no_std` or
+   real-time systems.
 
 ### Decoding Performance
 
-- **Zero allocations**: Returns slice references to existing data
-- **Zero copying**: No data duplication during decode
-- **Constant-time validation**: Efficient varint format checking
+- Zero allocations. Returns slice references to the input data.
+- No data copy during decode.
+- Efficient varint format checking.
 
-### Benchmark Results
+### Encoded Sizes
 
-Varint encoding is highly efficient:
-- Values 0-127: 1 byte
-- Values 128-16,383: 2 bytes
-- Values 16,384-2,097,151: 3 bytes
-- And so on...
+Varint encoding uses 1 to 10 bytes for integers. The size depends on the
+value.
 
-Maximum encoded sizes:
-- `u8`, `bool`: 2 bytes max
-- `u16`: 3 bytes max
-- `u32`: 5 bytes max
-- `u64`, `usize` (64-bit): 10 bytes max
-- `u128`: 19 bytes max
+- Values 0 to 127: 1 byte.
+- Values 128 to 16,383: 2 bytes.
+- Values 16,384 to 2,097,151: 3 bytes.
+
+Maximum encoded sizes by type:
+
+- `u8`, `bool`: 2 bytes.
+- `u16`: 3 bytes.
+- `u32`: 5 bytes.
+- `u64`, `usize` (64-bit): 10 bytes.
+- `u128`: 19 bytes.
 
 ## Thread Safety
 
-All traits and types in this crate are `Send + Sync`, making them safe to use in concurrent contexts.
+All traits and types in this crate are `Send + Sync`. You can use them in
+concurrent contexts.
 
-### Concurrency Patterns
+All operations are lock-free. No mutable state is shared.
 
-All these patterns work safely:
+## `no_std` Support
 
-```rust
-use std::sync::Arc;
-use std::thread;
-use multi_trait::{EncodeInto, TryDecodeFrom};
-
-// Parallel encoding
-let handles: Vec<_> = (0..10)
-    .map(|i| {
-        thread::spawn(move || {
-            let value = i as u32 * 100;
-            value.encode_into()
-        })
-    })
-    .collect();
-
-// Shared read access
-let data = Arc::new(vec![42u8, 100, 200]);
-let handles: Vec<_> = (0..4)
-    .map(|_| {
-        let data = Arc::clone(&data);
-        thread::spawn(move || {
-            let (value, _) = u8::try_decode_from(&data).unwrap();
-            value
-        })
-    })
-    .collect();
-```
-
-All operations are lock-free with no shared mutable state.
-
-## no_std Support
-
-This crate works in `no_std` environments with `alloc`:
+The crate works in `no_std` environments with `alloc`:
 
 ```toml
 [dependencies]
-multi-trait = { version = "1.0", default-features = false }
+multi-trait = { version = "1.1", default-features = false }
 ```
 
 Use `EncodeIntoArray` for heap-free encoding in embedded systems:
@@ -313,60 +286,63 @@ extern crate alloc;
 use alloc::vec::Vec;
 use multi_trait::EncodeIntoArray;
 
-// Stack-only encoding (no heap required for encoding)
 let (array, len) = 42u8.encode_into_array();
 
-// Only allocate if you need to store it
 let vec = Vec::from(&array[..len]);
 ```
 
 ## Feature Flags
 
-- **`std`** (default): Enables standard library support
-  - Enables `std::error::Error` implementation
-  - Enables backtrace support in errors
-  - Disable for `no_std`: `default-features = false`
+- `std` (default). Enables standard library support. It enables
+  `std::error::Error` implementation and backtrace support in errors.
+  Disable it for `no_std` with `default-features = false`. The crate needs
+  `alloc` when `std` is off.
 
 ## Supported Types
 
 All traits are implemented for:
-- `bool`: Encoded as 0 (false) or 1 (true)
-- `u8`, `u16`, `u32`, `u64`, `u128`: Variable-length encoding
-- `usize`: Platform-dependent (32-bit or 64-bit)
+
+- `bool`: Encoded as 0 (false) or 1 (true).
+- `u8`, `u16`, `u32`, `u64`, `u128`: Variable-length varint encoding.
+- `usize`: Platform-dependent (32-bit or 64-bit).
+- `[u8; N]`: Fixed-length byte arrays. `EncodeInto` encodes the raw bytes
+  without a varint prefix. `TryDecodeFrom` reads exactly N bytes. Use this
+  for BLS share identifiers and other fixed-size binary data.
+
+`EncodeIntoBuffer` and `EncodeIntoArray` are implemented for `bool`,
+`u8`, `u16`, `u32`, `u64`, `u128`, and `usize`. They do not support
+`[u8; N]`.
 
 ## Examples
 
-See the [`examples/`](examples/) directory for complete examples:
+See the `examples/` directory for complete examples:
 
-- [`basic.rs`](examples/basic.rs) - Basic encoding and decoding
-- [`error_handling.rs`](examples/error_handling.rs) - Error handling patterns
-- [`custom_type.rs`](examples/custom_type.rs) - Implementing traits for custom types
-- [`no_std.rs`](examples/no_std.rs) - Using the crate in no_std environments
+- `basic.rs` — Basic encoding and decoding.
+- `error_handling.rs` — Error handling patterns.
+- `custom_type.rs` — Implement the traits for custom types.
+- `no_std.rs` — Use the crate in `no_std` environments.
 
-Run examples with:
+Run an example:
+
 ```bash
 cargo run --example basic
-cargo run --example error_handling
-cargo run --example custom_type
 ```
 
 ## Testing
 
-The crate includes 150+ tests:
-- Unit tests for all trait implementations
-- Property-based tests with proptest
-- Concurrency tests for thread safety
-- Security tests for malicious inputs
-- Edge case tests
+The crate has 155 tests: unit, property-based, concurrency, security, and
+edge case tests.
 
-Run tests with:
+Run all tests:
+
 ```bash
 cargo test
 ```
 
 ## Documentation
 
-Generate and view the full API documentation:
+Generate and view the API documentation:
+
 ```bash
 cargo doc --open
 ```
@@ -377,11 +353,12 @@ Licensed under Apache-2.0. See [LICENSE](LICENSE) for details.
 
 ## Contributing
 
-Contributions are welcome! Please ensure:
-- All tests pass (`cargo test`)
-- Code is formatted (`cargo fmt`)
-- No clippy warnings (`cargo clippy`)
-- New features include tests and documentation
+Contributions are welcome. Before you submit a change, make sure:
+
+- All tests pass (`cargo test`).
+- The code is formatted (`cargo fmt`).
+- No clippy warnings (`cargo clippy`).
+- New features include tests and documentation.
 
 ## Links
 
