@@ -46,7 +46,7 @@ fn basic_encode_decode() {
     println!("Decoded value: {decoded}");
     println!("Remaining bytes: {remaining:?}");
     assert_eq!(value, decoded);
-    assert!(remaining.is_empty());
+    assert_eq!(remaining.len(), 0);
 
     println!();
 }
@@ -82,7 +82,7 @@ fn sequential_operations() {
     assert_eq!(val1, 42);
     assert_eq!(val2, 1000);
     assert_eq!(val3, 100000);
-    assert!(rest.is_empty());
+    assert_eq!(rest.len(), 0);
 
     println!();
 }

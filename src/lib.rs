@@ -504,7 +504,7 @@ mod test {
         // Verify decode
         let (val, rest) = u8::try_decode_from(&[0]).unwrap();
         assert_eq!(val, 0);
-        assert!(rest.is_empty());
+        assert_eq!(rest.len(), 0);
     }
 
     #[test]
@@ -513,7 +513,7 @@ mod test {
         let encoded = max.encode_into();
         let (decoded, remaining) = u8::try_decode_from(&encoded).unwrap();
         assert_eq!(decoded, max);
-        assert!(remaining.is_empty());
+        assert_eq!(remaining.len(), 0);
     }
 
     #[test]
@@ -522,7 +522,7 @@ mod test {
         let encoded = max.encode_into();
         let (decoded, remaining) = u16::try_decode_from(&encoded).unwrap();
         assert_eq!(decoded, max);
-        assert!(remaining.is_empty());
+        assert_eq!(remaining.len(), 0);
     }
 
     #[test]
@@ -531,7 +531,7 @@ mod test {
         let encoded = max.encode_into();
         let (decoded, remaining) = u32::try_decode_from(&encoded).unwrap();
         assert_eq!(decoded, max);
-        assert!(remaining.is_empty());
+        assert_eq!(remaining.len(), 0);
     }
 
     #[test]
@@ -540,7 +540,7 @@ mod test {
         let encoded = max.encode_into();
         let (decoded, remaining) = u64::try_decode_from(&encoded).unwrap();
         assert_eq!(decoded, max);
-        assert!(remaining.is_empty());
+        assert_eq!(remaining.len(), 0);
     }
 
     #[test]
@@ -549,7 +549,7 @@ mod test {
         let encoded = max.encode_into();
         let (decoded, remaining) = u128::try_decode_from(&encoded).unwrap();
         assert_eq!(decoded, max);
-        assert!(remaining.is_empty());
+        assert_eq!(remaining.len(), 0);
     }
 
     #[test]
@@ -591,7 +591,7 @@ mod test {
             let encoded = value.encode_into();
             let (decoded, remaining) = u8::try_decode_from(&encoded).unwrap();
             assert_eq!(decoded, value, "Round-trip failed for u8 value {value}");
-            assert!(remaining.is_empty());
+            assert_eq!(remaining.len(), 0);
         }
     }
 
@@ -602,7 +602,7 @@ mod test {
             let encoded = value.encode_into();
             let (decoded, remaining) = u16::try_decode_from(&encoded).unwrap();
             assert_eq!(decoded, value, "Round-trip failed for u16 value {value}");
-            assert!(remaining.is_empty());
+            assert_eq!(remaining.len(), 0);
         }
     }
 
@@ -613,7 +613,7 @@ mod test {
             let encoded = value.encode_into();
             let (decoded, remaining) = u32::try_decode_from(&encoded).unwrap();
             assert_eq!(decoded, value, "Round-trip failed for u32 value {value}");
-            assert!(remaining.is_empty());
+            assert_eq!(remaining.len(), 0);
         }
     }
 
@@ -624,7 +624,7 @@ mod test {
             let encoded = value.encode_into();
             let (decoded, remaining) = u64::try_decode_from(&encoded).unwrap();
             assert_eq!(decoded, value, "Round-trip failed for u64 value {value}");
-            assert!(remaining.is_empty());
+            assert_eq!(remaining.len(), 0);
         }
     }
 
@@ -634,7 +634,7 @@ mod test {
             let encoded = value.encode_into();
             let (decoded, remaining) = bool::try_decode_from(&encoded).unwrap();
             assert_eq!(decoded, value, "Round-trip failed for bool {value}");
-            assert!(remaining.is_empty());
+            assert_eq!(remaining.len(), 0);
         }
     }
 
@@ -882,7 +882,7 @@ mod test {
         assert_eq!(max_encoded.len(), 10);
         let (decoded, remaining) = u64::try_decode_from(&max_encoded).unwrap();
         assert_eq!(decoded, u64::MAX);
-        assert!(remaining.is_empty());
+        assert_eq!(remaining.len(), 0);
     }
 
     #[test]
@@ -892,7 +892,7 @@ mod test {
         assert_eq!(max_encoded.len(), 19);
         let (decoded, remaining) = u128::try_decode_from(&max_encoded).unwrap();
         assert_eq!(decoded, u128::MAX);
-        assert!(remaining.is_empty());
+        assert_eq!(remaining.len(), 0);
     }
 
     #[test]
