@@ -5,6 +5,18 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-10-08
+
+### Changed
+- Raised `rust-version` from 1.85 to 1.99 in `Cargo.toml`. The CI MSRV
+  job now installs Rust 1.99.0. The README MSRV line reads 1.99. A minor
+  release carries this change. A raised MSRV is possibly breaking under
+  the Cargo book rules.
+- Made `EncodedBytes::len` and `EncodedBytes::is_empty` const. This
+  change is additive. Fixed the clippy 0.1.99 `assert_is_empty` findings
+  in the unit tests and the basic example. No public item was removed or
+  renamed.
+
 ## [1.0.5] - 2026-07-29
 
 ### Changed
@@ -113,6 +125,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance characteristics documentation.
 - Thread safety documentation.
 
+[1.1.0]: https://github.com/cryptidtech/multi-trait/compare/v1.0.5...v1.1.0
 [1.0.5]: https://github.com/cryptidtech/multi-trait/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/cryptidtech/multi-trait/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/cryptidtech/multi-trait/compare/v1.0.1...v1.0.3
