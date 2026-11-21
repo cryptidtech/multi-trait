@@ -14,6 +14,11 @@ categories = ["encoding", "data-structures"]
 [features]
 default = ["std"]
 std = ["unsigned-varint/std"]
+# Feature names required by the shared family CI workflow test step. No code
+# in this crate gates on these yet.
+deprecated = []
+legacy_chacha20_fallback = []
+wasm = []
 
 [dependencies]
 thiserror = { version = "2.0", default-features = false }
